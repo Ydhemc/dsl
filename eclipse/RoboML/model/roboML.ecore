@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="roboML" nsURI="http://www.example.org/roboML" nsPrefix="roboML">
+  <eClassifiers xsi:type="ecore:EClass" name="Fontion" eSuperTypes="#//Declaration">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="type" upperBound="-1" eType="#//Type"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Instruction"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Unit"/>
+  <eClassifiers xsi:type="ecore:EClass" name="RobotProgram" abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="declaration" upperBound="-1"
+        eType="#//Declaration" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="instruction" upperBound="-1"
+        eType="#//Instruction" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="expression" upperBound="-1"
+        eType="#//Expression" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="BooleanExpr" eSuperTypes="#//Expression"/>
+  <eClassifiers xsi:type="ecore:EClass" name="loop" eSuperTypes="#//Instruction">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="booleanexpr" eType="#//BooleanExpr"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="instruction" upperBound="-1"
+        eType="#//Instruction" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Condition" eSuperTypes="#//Instruction">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="booleanexpr" eType="#//BooleanExpr"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="instruction" upperBound="-1"
+        eType="#//Instruction" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="variable" eSuperTypes="#//Declaration">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="bool" eType="#//Bool"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Expression" abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="variable" upperBound="-1"
+        eType="#//variable" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="ArithmeticExpr" eSuperTypes="#//Expression"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Declaration" abstract="true"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Type"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Bool" eSuperTypes="#//Type"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Real" eSuperTypes="#//Type">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="unit" eType="#//Unit"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Call" eSuperTypes="#//Instruction">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="fontion" eType="#//Fontion"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Assignment" eSuperTypes="#//Instruction">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="expression" eType="#//Expression"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="variable" eType="#//variable"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="CallExpr" eSuperTypes="#//Expression">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="fontion" eType="#//Fontion"
+        containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Sensor" eSuperTypes="#//Declaration"/>
+</ecore:EPackage>

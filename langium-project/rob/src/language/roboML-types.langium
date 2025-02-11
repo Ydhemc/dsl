@@ -35,14 +35,14 @@ interface Expression {
 
 interface Variable extends Declaration {
 	^type?: @Type
-	name?: String
+	name?: TString
 }
 
 interface Declaration {
 }
 
 interface Sensor extends Declaration {
-	name?: String
+	name?: TString
 }
 
 interface Negative extends ArithmeticExpr {
@@ -71,13 +71,13 @@ interface CallExpr extends Expression {
 
 interface Fonction extends Declaration {
 	parameter: @Parameter[]
-	name?: String
+	name?: TString
 	typeReturn?: @Type
 }
 
 interface Parameter {
 	^type?: @Type
-	name?: String
+	name?: TString
 }
 
 interface VarExpr extends Expression {

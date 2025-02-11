@@ -31,7 +31,7 @@ Type_Impl returns Type:
     {Type} 'Type'  
 ;
 
-String0 returns String:
+String0 returns TString:
     'String' 
 ;
 

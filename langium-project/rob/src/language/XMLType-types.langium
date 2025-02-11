@@ -1,3 +1,3 @@
 
-type String = string;
+type TString = string;
 

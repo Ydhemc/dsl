@@ -1,5 +1,5 @@
 {
-    "projectName": "RobotMl",
+    "projectName": "RobotML",
     "languages": [{
         "id": "robot-ml",
         "grammar": "src/language/robot-ml.langium",

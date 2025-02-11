@@ -1,4 +1,4 @@
-grammar MyDsl
+grammar RobotML
 import 'Terminals'
 import 'roboML-types'
 import 'XMLType-types'

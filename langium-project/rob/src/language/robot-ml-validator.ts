@@ -1,10 +1,10 @@
-import type { ValidationAcceptor, ValidationChecks } from 'langium';
-import type { RobotMlAstType, Person } from './generated/ast.js';
-import type { RobotMlServices } from './robot-ml-module.js';
+// import type { ValidationAcceptor, ValidationChecks } from 'langium';
+// import type { RobotMLAstType } from './generated/ast.js';
+// import type { RobotMLServices } from './robot-ml-module.js';
 
 /**
  * Register custom validation checks.
- */
+ *
 export function registerValidationChecks(services: RobotMlServices) {
     const registry = services.validation.ValidationRegistry;
     const validator = services.validation.RobotMlValidator;
@@ -13,12 +13,15 @@ export function registerValidationChecks(services: RobotMlServices) {
     };
     registry.register(checks, validator);
 }
+*/
+
 
 /**
  * Implementation of custom validations.
  */
-export class RobotMlValidator {
+export class RobotMLValidator {
 
+    /*
     checkPersonStartsWithCapital(person: Person, accept: ValidationAcceptor): void {
         if (person.name) {
             const firstChar = person.name.substring(0, 1);
@@ -26,6 +29,6 @@ export class RobotMlValidator {
                 accept('warning', 'Person name should start with a capital.', { node: person, property: 'name' });
             }
         }
-    }
+    }*/
 
 }

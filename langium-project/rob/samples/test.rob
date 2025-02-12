@@ -20,8 +20,8 @@ bool Hello(){
     }
 }
 
-ILoveThisCode(bool a, real: mm v){
+iLoveThisCode(bool a, real: mm v){
     a = false;
-    ILoveThisCode(a, v+1);
+    iLoveThisCode(a, v+1);
 }
 

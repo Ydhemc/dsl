@@ -9,7 +9,7 @@ export function registerValidationChecks(services: RobotMLServices) {
     const registry = services.validation.ValidationRegistry;
     const validator = services.validation.RobotMLValidator;
     const checks: ValidationChecks<RobotMLAstType> = {
-        Func: validator.checkFuncFirstCharLowercase
+        Func: validator.checkFuncNameLowerCamelCase
     };
     registry.register(checks, validator);
 }
@@ -22,10 +22,10 @@ export function registerValidationChecks(services: RobotMLServices) {
 export class RobotMLValidator {
 
     
-    checkFuncFirstCharLowercase(func: Func, accept: ValidationAcceptor): void {
-        const firstChar = func.name.substring(0, 1)
-        if (firstChar.toLowerCase() != firstChar) {
-            accept('warning', 'Func name should be CamelCase.', { node: func, property: 'name' });
+    checkFuncNameLowerCamelCase(func: Func, accept: ValidationAcceptor): void {
+        const camelCaseRegex = /^[a-z]+(?:[A-Z0-9]+[a-z0-9]+[A-Za-z0-9]*)*$/
+        if (!camelCaseRegex.test(func.name)) {
+            accept('warning', 'Func name should be camelCase.', { node: func, property: 'name' });
         }
     }
 

@@ -7,30 +7,33 @@ import com.google.inject.Inject
 import org.eclipse.xtext.formatting2.AbstractFormatter2
 import org.eclipse.xtext.formatting2.IFormattableDocument
 import org.xtext.example.mydsl.services.MyDslGrammarAccess
-import roboML.BinaryArithmetic
-import roboML.Negative
+import roboML.Loop
+import roboML.RobotProgram
 
 class MyDslFormatter extends AbstractFormatter2 {
 	
 	@Inject extension MyDslGrammarAccess
 
-	def dispatch void format(Negative negative, extension IFormattableDocument document) {
+	def dispatch void format(RobotProgram robotProgram, extension IFormattableDocument document) {
 		// TODO: format HiddenRegions around keywords, attributes, cross references, etc. 
-		for (variable : negative.variable) {
-			variable.format
+		for (declaration : robotProgram.declaration) {
+			declaration.format
 		}
-		negative.expression.format
-	}
-
-	def dispatch void format(BinaryArithmetic binaryArithmetic, extension IFormattableDocument document) {
-		// TODO: format HiddenRegions around keywords, attributes, cross references, etc. 
-		for (variable : binaryArithmetic.variable) {
-			variable.format
+		for (instruction : robotProgram.instruction) {
+			instruction.format
 		}
-		for (expression : binaryArithmetic.expression) {
+		for (expression : robotProgram.expression) {
 			expression.format
 		}
 	}
+
+	def dispatch void format(Loop loop, extension IFormattableDocument document) {
+		// TODO: format HiddenRegions around keywords, attributes, cross references, etc. 
+		loop.booleanexpr.format
+		for (instruction : loop.instruction) {
+			instruction.format
+		}
+	}
 	
-	// TODO: implement for CallExpr, VarExpr, Not, BinaryBool, SensorExpr
+	// TODO: implement for Condition, Assignment, Block, Forward, Rotate, Left, Backward, Right, Speed, Not, BinaryBool, CallExpr, VarExpr, Negative, BinaryArithmetic, SensorExpr
 }

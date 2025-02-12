@@ -4,7 +4,7 @@
   <eClassifiers xsi:type="ecore:EClass" name="Fonction" eSuperTypes="#//Declaration">
     <eStructuralFeatures xsi:type="ecore:EReference" name="parameter" upperBound="-1"
         eType="#//Parameter"/>
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2003/XMLType#//String"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="typeReturn" eType="#//Type"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Instruction" abstract="true" interface="true"/>
@@ -33,7 +33,7 @@
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Variable" eSuperTypes="#//Declaration">
     <eStructuralFeatures xsi:type="ecore:EReference" name="type" eType="#//Type"/>
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2003/XMLType#//String"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Expression" abstract="true">
     <eStructuralFeatures xsi:type="ecore:EReference" name="variable" upperBound="-1"
@@ -62,11 +62,11 @@
     <eStructuralFeatures xsi:type="ecore:EReference" name="fonction" eType="#//Fonction"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Sensor" eSuperTypes="#//Declaration">
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2003/XMLType#//String"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Parameter">
     <eStructuralFeatures xsi:type="ecore:EReference" name="type" eType="#//Type"/>
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2003/XMLType#//String"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="VarExpr" eSuperTypes="#//Expression">
     <eStructuralFeatures xsi:type="ecore:EReference" name="variableRef" eType="#//Variable"/>
@@ -128,11 +128,11 @@
     <eStructuralFeatures xsi:type="ecore:EReference" name="expression" lowerBound="2"
         upperBound="2" eType="#//Expression" containment="true"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="Not" eSuperTypes="#//Expression">
+  <eClassifiers xsi:type="ecore:EClass" name="Not" eSuperTypes="#//Expression #//BooleanExpr">
     <eStructuralFeatures xsi:type="ecore:EReference" name="expression" lowerBound="1"
         eType="#//Expression" containment="true"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="BinaryBool" eSuperTypes="#//Expression">
+  <eClassifiers xsi:type="ecore:EClass" name="BinaryBool" eSuperTypes="#//Expression #//BooleanExpr">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="operation" eType="#//BoolOperation"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="expression" lowerBound="2"
         upperBound="2" eType="#//Expression" containment="true"/>

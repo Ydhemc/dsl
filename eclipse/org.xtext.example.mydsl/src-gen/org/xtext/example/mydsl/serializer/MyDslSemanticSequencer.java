@@ -11,24 +11,39 @@ import org.eclipse.xtext.Action;
 import org.eclipse.xtext.Parameter;
 import org.eclipse.xtext.ParserRule;
 import org.eclipse.xtext.serializer.ISerializationContext;
+import org.eclipse.xtext.serializer.acceptor.SequenceFeeder;
 import org.eclipse.xtext.serializer.sequencer.AbstractDelegatingSemanticSequencer;
+import org.eclipse.xtext.serializer.sequencer.ITransientValueService.ValueTransient;
 import org.xtext.example.mydsl.services.MyDslGrammarAccess;
+import roboML.Assignment;
+import roboML.Backward;
 import roboML.BinaryArithmetic;
 import roboML.BinaryBool;
+import roboML.Block;
 import roboML.Bool;
+import roboML.Call;
 import roboML.CallExpr;
+import roboML.Condition;
 import roboML.Fonction;
+import roboML.Forward;
+import roboML.Left;
+import roboML.Loop;
 import roboML.Negative;
 import roboML.Not;
 import roboML.Real;
+import roboML.Right;
 import roboML.RoboMLPackage;
+import roboML.RobotProgram;
+import roboML.Rotate;
 import roboML.Sensor;
 import roboML.SensorDistance;
 import roboML.SensorExpr;
 import roboML.SensorTime;
+import roboML.Speed;
 import roboML.Type;
 import roboML.VarExpr;
 import roboML.Variable;
+import roboML.return;
 
 @SuppressWarnings("all")
 public class MyDslSemanticSequencer extends AbstractDelegatingSemanticSequencer {
@@ -44,20 +59,44 @@ public class MyDslSemanticSequencer extends AbstractDelegatingSemanticSequencer 
 		Set<Parameter> parameters = context.getEnabledBooleanParameters();
 		if (epackage == RoboMLPackage.eINSTANCE)
 			switch (semanticObject.eClass().getClassifierID()) {
+			case RoboMLPackage.ASSIGNMENT:
+				sequence_Assignment(context, (Assignment) semanticObject); 
+				return; 
+			case RoboMLPackage.BACKWARD:
+				sequence_Backward(context, (Backward) semanticObject); 
+				return; 
 			case RoboMLPackage.BINARY_ARITHMETIC:
 				sequence_BinaryArithmetic(context, (BinaryArithmetic) semanticObject); 
 				return; 
 			case RoboMLPackage.BINARY_BOOL:
 				sequence_BinaryBool(context, (BinaryBool) semanticObject); 
 				return; 
+			case RoboMLPackage.BLOCK:
+				sequence_Block(context, (Block) semanticObject); 
+				return; 
 			case RoboMLPackage.BOOL:
 				sequence_Bool(context, (Bool) semanticObject); 
+				return; 
+			case RoboMLPackage.CALL:
+				sequence_Call(context, (Call) semanticObject); 
 				return; 
 			case RoboMLPackage.CALL_EXPR:
 				sequence_CallExpr(context, (CallExpr) semanticObject); 
 				return; 
+			case RoboMLPackage.CONDITION:
+				sequence_Condition(context, (Condition) semanticObject); 
+				return; 
 			case RoboMLPackage.FONCTION:
 				sequence_Fonction(context, (Fonction) semanticObject); 
+				return; 
+			case RoboMLPackage.FORWARD:
+				sequence_Forward(context, (Forward) semanticObject); 
+				return; 
+			case RoboMLPackage.LEFT:
+				sequence_Left(context, (Left) semanticObject); 
+				return; 
+			case RoboMLPackage.LOOP:
+				sequence_Loop(context, (Loop) semanticObject); 
 				return; 
 			case RoboMLPackage.NEGATIVE:
 				sequence_Negative(context, (Negative) semanticObject); 
@@ -71,6 +110,15 @@ public class MyDslSemanticSequencer extends AbstractDelegatingSemanticSequencer 
 			case RoboMLPackage.REAL:
 				sequence_Real(context, (Real) semanticObject); 
 				return; 
+			case RoboMLPackage.RIGHT:
+				sequence_Right(context, (Right) semanticObject); 
+				return; 
+			case RoboMLPackage.ROBOT_PROGRAM:
+				sequence_RobotProgram(context, (RobotProgram) semanticObject); 
+				return; 
+			case RoboMLPackage.ROTATE:
+				sequence_Rotate(context, (Rotate) semanticObject); 
+				return; 
 			case RoboMLPackage.SENSOR:
 				sequence_Sensor_Impl(context, (Sensor) semanticObject); 
 				return; 
@@ -83,6 +131,9 @@ public class MyDslSemanticSequencer extends AbstractDelegatingSemanticSequencer 
 			case RoboMLPackage.SENSOR_TIME:
 				sequence_SensorTime(context, (SensorTime) semanticObject); 
 				return; 
+			case RoboMLPackage.SPEED:
+				sequence_Speed(context, (Speed) semanticObject); 
+				return; 
 			case RoboMLPackage.TYPE:
 				sequence_Type_Impl(context, (Type) semanticObject); 
 				return; 
@@ -92,10 +143,43 @@ public class MyDslSemanticSequencer extends AbstractDelegatingSemanticSequencer 
 			case RoboMLPackage.VARIABLE:
 				sequence_Variable(context, (Variable) semanticObject); 
 				return; 
+			case RoboMLPackage.RETURN:
+				sequence_return(context, (return) semanticObject); 
+				return; 
 			}
 		if (errorAcceptor != null)
 			errorAcceptor.accept(diagnosticProvider.createInvalidContextOrTypeDiagnostic(semanticObject, context));
 	}
+	
+	/**
+	 * <pre>
+	 * Contexts:
+	 *     Instruction returns Assignment
+	 *     Assignment returns Assignment
+	 *
+	 * Constraint:
+	 *     (variable=[Variable|EString]? expression=Expression?)
+	 * </pre>
+	 */
+	protected void sequence_Assignment(ISerializationContext context, Assignment semanticObject) {
+		genericSequencer.createSequence(context, semanticObject);
+	}
+	
+	
+	/**
+	 * <pre>
+	 * Contexts:
+	 *     Instruction returns Backward
+	 *     Backward returns Backward
+	 *
+	 * Constraint:
+	 *     parameters=Expression?
+	 * </pre>
+	 */
+	protected void sequence_Backward(ISerializationContext context, Backward semanticObject) {
+		genericSequencer.createSequence(context, semanticObject);
+	}
+	
 	
 	/**
 	 * <pre>
@@ -116,6 +200,7 @@ public class MyDslSemanticSequencer extends AbstractDelegatingSemanticSequencer 
 	 * <pre>
 	 * Contexts:
 	 *     Expression returns BinaryBool
+	 *     BooleanExpr returns BinaryBool
 	 *     BinaryBool returns BinaryBool
 	 *
 	 * Constraint:
@@ -123,6 +208,21 @@ public class MyDslSemanticSequencer extends AbstractDelegatingSemanticSequencer 
 	 * </pre>
 	 */
 	protected void sequence_BinaryBool(ISerializationContext context, BinaryBool semanticObject) {
+		genericSequencer.createSequence(context, semanticObject);
+	}
+	
+	
+	/**
+	 * <pre>
+	 * Contexts:
+	 *     Instruction returns Block
+	 *     Block returns Block
+	 *
+	 * Constraint:
+	 *     (instruction+=Instruction instruction+=Instruction*)?
+	 * </pre>
+	 */
+	protected void sequence_Block(ISerializationContext context, Block semanticObject) {
 		genericSequencer.createSequence(context, semanticObject);
 	}
 	
@@ -160,13 +260,89 @@ public class MyDslSemanticSequencer extends AbstractDelegatingSemanticSequencer 
 	/**
 	 * <pre>
 	 * Contexts:
+	 *     Instruction returns Call
+	 *     Call returns Call
+	 *
+	 * Constraint:
+	 *     ((parameters+=[Expression|EString] parameters+=[Expression|EString]*)? fonction=[Fonction|EString]?)
+	 * </pre>
+	 */
+	protected void sequence_Call(ISerializationContext context, Call semanticObject) {
+		genericSequencer.createSequence(context, semanticObject);
+	}
+	
+	
+	/**
+	 * <pre>
+	 * Contexts:
+	 *     Instruction returns Condition
+	 *     Condition returns Condition
+	 *
+	 * Constraint:
+	 *     (booleanexpr=BooleanExpr? if=Instruction? else=Instruction?)
+	 * </pre>
+	 */
+	protected void sequence_Condition(ISerializationContext context, Condition semanticObject) {
+		genericSequencer.createSequence(context, semanticObject);
+	}
+	
+	
+	/**
+	 * <pre>
+	 * Contexts:
+	 *     Declaration returns Fonction
 	 *     Fonction returns Fonction
 	 *
 	 * Constraint:
-	 *     (name=String0? (parameter+=[Parameter|EString] parameter+=[Parameter|EString]*)? typeReturn=[Type|EString]?)
+	 *     (name=EString (parameter+=[Parameter|EString] parameter+=[Parameter|EString]*)? typeReturn=[Type|EString]?)
 	 * </pre>
 	 */
 	protected void sequence_Fonction(ISerializationContext context, Fonction semanticObject) {
+		genericSequencer.createSequence(context, semanticObject);
+	}
+	
+	
+	/**
+	 * <pre>
+	 * Contexts:
+	 *     Instruction returns Forward
+	 *     Forward returns Forward
+	 *
+	 * Constraint:
+	 *     parameters=Expression?
+	 * </pre>
+	 */
+	protected void sequence_Forward(ISerializationContext context, Forward semanticObject) {
+		genericSequencer.createSequence(context, semanticObject);
+	}
+	
+	
+	/**
+	 * <pre>
+	 * Contexts:
+	 *     Instruction returns Left
+	 *     Left returns Left
+	 *
+	 * Constraint:
+	 *     parameters=Expression?
+	 * </pre>
+	 */
+	protected void sequence_Left(ISerializationContext context, Left semanticObject) {
+		genericSequencer.createSequence(context, semanticObject);
+	}
+	
+	
+	/**
+	 * <pre>
+	 * Contexts:
+	 *     Instruction returns Loop
+	 *     Loop returns Loop
+	 *
+	 * Constraint:
+	 *     (booleanexpr=BooleanExpr? (instruction+=Instruction instruction+=Instruction*)?)
+	 * </pre>
+	 */
+	protected void sequence_Loop(ISerializationContext context, Loop semanticObject) {
 		genericSequencer.createSequence(context, semanticObject);
 	}
 	
@@ -190,6 +366,7 @@ public class MyDslSemanticSequencer extends AbstractDelegatingSemanticSequencer 
 	 * <pre>
 	 * Contexts:
 	 *     Expression returns Not
+	 *     BooleanExpr returns Not
 	 *     Not returns Not
 	 *
 	 * Constraint:
@@ -207,7 +384,7 @@ public class MyDslSemanticSequencer extends AbstractDelegatingSemanticSequencer 
 	 *     Parameter returns Parameter
 	 *
 	 * Constraint:
-	 *     (name=String0? type=[Type|EString]?)
+	 *     (name=EString type=[Type|EString]?)
 	 * </pre>
 	 */
 	protected void sequence_Parameter(ISerializationContext context, roboML.Parameter semanticObject) {
@@ -233,15 +410,70 @@ public class MyDslSemanticSequencer extends AbstractDelegatingSemanticSequencer 
 	/**
 	 * <pre>
 	 * Contexts:
+	 *     Instruction returns Right
+	 *     Right returns Right
+	 *
+	 * Constraint:
+	 *     parameters=Expression?
+	 * </pre>
+	 */
+	protected void sequence_Right(ISerializationContext context, Right semanticObject) {
+		genericSequencer.createSequence(context, semanticObject);
+	}
+	
+	
+	/**
+	 * <pre>
+	 * Contexts:
+	 *     RobotProgram returns RobotProgram
+	 *
+	 * Constraint:
+	 *     (
+	 *         (declaration+=Declaration declaration+=Declaration*)? 
+	 *         (instruction+=Instruction instruction+=Instruction*)? 
+	 *         (expression+=Expression expression+=Expression*)?
+	 *     )
+	 * </pre>
+	 */
+	protected void sequence_RobotProgram(ISerializationContext context, RobotProgram semanticObject) {
+		genericSequencer.createSequence(context, semanticObject);
+	}
+	
+	
+	/**
+	 * <pre>
+	 * Contexts:
+	 *     Instruction returns Rotate
+	 *     Rotate returns Rotate
+	 *
+	 * Constraint:
+	 *     parameters=Expression?
+	 * </pre>
+	 */
+	protected void sequence_Rotate(ISerializationContext context, Rotate semanticObject) {
+		genericSequencer.createSequence(context, semanticObject);
+	}
+	
+	
+	/**
+	 * <pre>
+	 * Contexts:
+	 *     Declaration returns SensorDistance
 	 *     Sensor returns SensorDistance
 	 *     SensorDistance returns SensorDistance
 	 *
 	 * Constraint:
-	 *     name=String0?
+	 *     name=EString
 	 * </pre>
 	 */
 	protected void sequence_SensorDistance(ISerializationContext context, SensorDistance semanticObject) {
-		genericSequencer.createSequence(context, semanticObject);
+		if (errorAcceptor != null) {
+			if (transientValues.isValueTransient(semanticObject, RoboMLPackage.Literals.SENSOR__NAME) == ValueTransient.YES)
+				errorAcceptor.accept(diagnosticProvider.createFeatureValueMissing(semanticObject, RoboMLPackage.Literals.SENSOR__NAME));
+		}
+		SequenceFeeder feeder = createSequencerFeeder(context, semanticObject);
+		feeder.accept(grammarAccess.getSensorDistanceAccess().getNameEStringParserRuleCall_2_0(), semanticObject.getName());
+		feeder.finish();
 	}
 	
 	
@@ -263,29 +495,58 @@ public class MyDslSemanticSequencer extends AbstractDelegatingSemanticSequencer 
 	/**
 	 * <pre>
 	 * Contexts:
+	 *     Declaration returns SensorTime
 	 *     Sensor returns SensorTime
 	 *     SensorTime returns SensorTime
 	 *
 	 * Constraint:
-	 *     name=String0?
+	 *     name=EString
 	 * </pre>
 	 */
 	protected void sequence_SensorTime(ISerializationContext context, SensorTime semanticObject) {
-		genericSequencer.createSequence(context, semanticObject);
+		if (errorAcceptor != null) {
+			if (transientValues.isValueTransient(semanticObject, RoboMLPackage.Literals.SENSOR__NAME) == ValueTransient.YES)
+				errorAcceptor.accept(diagnosticProvider.createFeatureValueMissing(semanticObject, RoboMLPackage.Literals.SENSOR__NAME));
+		}
+		SequenceFeeder feeder = createSequencerFeeder(context, semanticObject);
+		feeder.accept(grammarAccess.getSensorTimeAccess().getNameEStringParserRuleCall_2_0(), semanticObject.getName());
+		feeder.finish();
 	}
 	
 	
 	/**
 	 * <pre>
 	 * Contexts:
+	 *     Declaration returns Sensor
 	 *     Sensor returns Sensor
 	 *     Sensor_Impl returns Sensor
 	 *
 	 * Constraint:
-	 *     name=String0?
+	 *     name=EString
 	 * </pre>
 	 */
 	protected void sequence_Sensor_Impl(ISerializationContext context, Sensor semanticObject) {
+		if (errorAcceptor != null) {
+			if (transientValues.isValueTransient(semanticObject, RoboMLPackage.Literals.SENSOR__NAME) == ValueTransient.YES)
+				errorAcceptor.accept(diagnosticProvider.createFeatureValueMissing(semanticObject, RoboMLPackage.Literals.SENSOR__NAME));
+		}
+		SequenceFeeder feeder = createSequencerFeeder(context, semanticObject);
+		feeder.accept(grammarAccess.getSensor_ImplAccess().getNameEStringParserRuleCall_2_0(), semanticObject.getName());
+		feeder.finish();
+	}
+	
+	
+	/**
+	 * <pre>
+	 * Contexts:
+	 *     Instruction returns Speed
+	 *     Speed returns Speed
+	 *
+	 * Constraint:
+	 *     parameters=Expression?
+	 * </pre>
+	 */
+	protected void sequence_Speed(ISerializationContext context, Speed semanticObject) {
 		genericSequencer.createSequence(context, semanticObject);
 	}
 	
@@ -323,13 +584,29 @@ public class MyDslSemanticSequencer extends AbstractDelegatingSemanticSequencer 
 	/**
 	 * <pre>
 	 * Contexts:
+	 *     Declaration returns Variable
 	 *     Variable returns Variable
 	 *
 	 * Constraint:
-	 *     (name=String0? type=[Type|EString]?)
+	 *     (name=EString type=[Type|EString]?)
 	 * </pre>
 	 */
 	protected void sequence_Variable(ISerializationContext context, Variable semanticObject) {
+		genericSequencer.createSequence(context, semanticObject);
+	}
+	
+	
+	/**
+	 * <pre>
+	 * Contexts:
+	 *     Instruction returns return
+	 *     return returns return
+	 *
+	 * Constraint:
+	 *     expression=[Expression|EString]?
+	 * </pre>
+	 */
+	protected void sequence_return(ISerializationContext context, return semanticObject) {
 		genericSequencer.createSequence(context, semanticObject);
 	}
 	

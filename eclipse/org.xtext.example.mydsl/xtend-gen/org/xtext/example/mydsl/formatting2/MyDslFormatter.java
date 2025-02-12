@@ -5,6 +5,7 @@ package org.xtext.example.mydsl.formatting2;
 
 import com.google.inject.Inject;
 import java.util.Arrays;
+import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.xtext.formatting2.AbstractFormatter2;
 import org.eclipse.xtext.formatting2.IFormattableDocument;
@@ -12,6 +13,12 @@ import org.eclipse.xtext.resource.XtextResource;
 import org.eclipse.xtext.xbase.lib.Extension;
 import org.eclipse.xtext.xbase.lib.XbaseGenerated;
 import org.xtext.example.mydsl.services.MyDslGrammarAccess;
+import roboML.BooleanExpr;
+import roboML.Declaration;
+import roboML.Expression;
+import roboML.Instruction;
+import roboML.Loop;
+import roboML.RobotProgram;
 
 @SuppressWarnings("all")
 public class MyDslFormatter extends AbstractFormatter2 {
@@ -19,42 +26,52 @@ public class MyDslFormatter extends AbstractFormatter2 {
   @Extension
   private MyDslGrammarAccess _myDslGrammarAccess;
 
-  protected void _format(final /* Negative */Object negative, @Extension final IFormattableDocument document) {
-    throw new Error("Unresolved compilation problems:"
-      + "\nvariable cannot be resolved"
-      + "\nformat cannot be resolved"
-      + "\nexpression cannot be resolved"
-      + "\nformat cannot be resolved");
+  protected void _format(final RobotProgram robotProgram, @Extension final IFormattableDocument document) {
+    EList<Declaration> _declaration = robotProgram.getDeclaration();
+    for (final Declaration declaration : _declaration) {
+      document.<Declaration>format(declaration);
+    }
+    EList<Instruction> _instruction = robotProgram.getInstruction();
+    for (final Instruction instruction : _instruction) {
+      document.<Instruction>format(instruction);
+    }
+    EList<Expression> _expression = robotProgram.getExpression();
+    for (final Expression expression : _expression) {
+      document.<Expression>format(expression);
+    }
   }
 
-  protected void _format(final /* BinaryArithmetic */Object binaryArithmetic, @Extension final IFormattableDocument document) {
-    throw new Error("Unresolved compilation problems:"
-      + "\nvariable cannot be resolved"
-      + "\nformat cannot be resolved"
-      + "\nexpression cannot be resolved"
-      + "\nformat cannot be resolved");
+  protected void _format(final Loop loop, @Extension final IFormattableDocument document) {
+    document.<BooleanExpr>format(loop.getBooleanexpr());
+    EList<Instruction> _instruction = loop.getInstruction();
+    for (final Instruction instruction : _instruction) {
+      document.<Instruction>format(instruction);
+    }
   }
 
   @XbaseGenerated
-  public void format(final Object negative, final IFormattableDocument document) {
-    if (negative instanceof XtextResource) {
-      _format((XtextResource)negative, document);
+  public void format(final Object loop, final IFormattableDocument document) {
+    if (loop instanceof XtextResource) {
+      _format((XtextResource)loop, document);
       return;
-    } else if (negative instanceof EObject) {
-      _format((EObject)negative, document);
+    } else if (loop instanceof Loop) {
+      _format((Loop)loop, document);
       return;
-    } else if (negative == null) {
+    } else if (loop instanceof RobotProgram) {
+      _format((RobotProgram)loop, document);
+      return;
+    } else if (loop instanceof EObject) {
+      _format((EObject)loop, document);
+      return;
+    } else if (loop == null) {
       _format((Void)null, document);
       return;
-    } else if (negative != null) {
-      _format(negative, document);
-      return;
-    } else if (negative != null) {
-      _format(negative, document);
+    } else if (loop != null) {
+      _format(loop, document);
       return;
     } else {
       throw new IllegalArgumentException("Unhandled parameter types: " +
-        Arrays.<Object>asList(negative, document).toString());
+        Arrays.<Object>asList(loop, document).toString());
     }
   }
 }

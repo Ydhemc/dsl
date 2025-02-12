@@ -1,10 +1,3 @@
-import 'XMLType-types'
-
-type ArithmeticOperation = ArithmeticOperation_ADD | ArithmeticOperation_SUB | ArithmeticOperation_DIV | ArithmeticOperation_MULT;
-type ArithmeticOperation_ADD = 'ADD';
-type ArithmeticOperation_SUB = 'SUB';
-type ArithmeticOperation_DIV = 'DIV';
-type ArithmeticOperation_MULT = 'MULT';
 
 type Unit = Unit_MM | Unit_KM | Unit_CM | Unit_M | Unit_DM | Unit_HM | Unit_DAM | Unit_RAD;
 type Unit_MM = 'MM';
@@ -26,7 +19,22 @@ type BoolOperation_NEQ = 'NEQ';
 type BoolOperation_OR = 'OR';
 type BoolOperation_AND = 'AND';
 
-interface Type {
+type ArithmeticOperation = ArithmeticOperation_ADD | ArithmeticOperation_SUB | ArithmeticOperation_DIV | ArithmeticOperation_MULT;
+type ArithmeticOperation_ADD = 'ADD';
+type ArithmeticOperation_SUB = 'SUB';
+type ArithmeticOperation_DIV = 'DIV';
+type ArithmeticOperation_MULT = 'MULT';
+
+interface RobotProgram {
+	declaration: Declaration[]
+	instruction: Instruction[]
+	expression: Expression[]
+}
+
+interface Declaration {
+}
+
+interface Instruction {
 }
 
 interface Expression {
@@ -35,14 +43,111 @@ interface Expression {
 
 interface Variable extends Declaration {
 	^type?: @Type
-	name?: String
+	name?: string
 }
 
-interface Declaration {
+interface Type {
+}
+
+interface BooleanExpr extends Expression {
 }
 
 interface Sensor extends Declaration {
-	name?: String
+	name?: string
+}
+
+interface Fonction extends Declaration {
+	parameter: @Parameter[]
+	name?: string
+	typeReturn?: @Type
+}
+
+interface Parameter {
+	^type?: @Type
+	name?: string
+}
+
+interface SensorDistance extends Sensor {
+}
+
+interface SensorTime extends Sensor {
+}
+
+interface Bool extends Type {
+}
+
+interface Real extends Type {
+	unit?: Unit
+}
+
+interface Loop extends Instruction {
+	booleanexpr?: BooleanExpr
+	instruction: Instruction[]
+}
+
+interface Condition extends Instruction {
+	booleanexpr?: BooleanExpr
+	if?: Instruction
+	else?: Instruction
+}
+
+interface Call extends Instruction {
+	parameters: @Expression[]
+	fonction?: @Fonction
+}
+
+interface Assignment extends Instruction {
+	expression?: Expression
+	variable?: @Variable
+}
+
+interface return extends Instruction {
+	expression?: @Expression
+}
+
+interface Block extends Instruction {
+	instruction: Instruction[]
+}
+
+interface Forward extends Movement {
+}
+
+interface Movement extends Instruction {
+	parameters?: Expression
+}
+
+interface Rotate extends Movement {
+}
+
+interface Left extends Movement {
+}
+
+interface Backward extends Movement {
+}
+
+interface Right extends Movement {
+}
+
+interface Speed extends Instruction {
+	parameters?: Expression
+}
+
+interface Not extends Expression, BooleanExpr {
+	expression: Expression
+}
+
+interface BinaryBool extends Expression, BooleanExpr {
+	operation?: BoolOperation
+	expression: Expression[]
+}
+
+interface CallExpr extends Expression {
+	parameters: Expression[]
+	fonction?: @Fonction
+}
+
+interface VarExpr extends Expression {
+	variableRef?: @Variable
 }
 
 interface Negative extends ArithmeticExpr {
@@ -57,49 +162,7 @@ interface BinaryArithmetic extends ArithmeticExpr {
 	expression: Expression[]
 }
 
-interface Bool extends Type {
-}
-
-interface Real extends Type {
-	unit?: Unit
-}
-
-interface CallExpr extends Expression {
-	parameters: Expression[]
-	fonction?: @Fonction
-}
-
-interface Fonction extends Declaration {
-	parameter: @Parameter[]
-	name?: String
-	typeReturn?: @Type
-}
-
-interface Parameter {
-	^type?: @Type
-	name?: String
-}
-
-interface VarExpr extends Expression {
-	variableRef?: @Variable
-}
-
-interface Not extends Expression {
-	expression: Expression
-}
-
-interface BinaryBool extends Expression {
-	operation?: BoolOperation
-	expression: Expression[]
-}
-
 interface SensorExpr extends Expression {
 	sensor?: @Sensor
-}
-
-interface SensorDistance extends Sensor {
-}
-
-interface SensorTime extends Sensor {
 }
 

@@ -26,8 +26,8 @@ type ArithmeticOperation_DIV = '/';
 type ArithmeticOperation_MULT = '*';
 
 interface RobotProgram {
-	declaration: Declaration[]
-	instruction: Instruction[]
+	declarations: Declaration[]
+	instructions: Instruction[]
 }
 
 interface Declaration {
@@ -41,8 +41,8 @@ interface Expression {
 }
 
 interface Variable extends Declaration {
-	^type?: Type
-	name?: string
+	^type: Type
+	name: string
 }
 
 interface Type {
@@ -52,19 +52,17 @@ interface BooleanExpr extends Expression {
 }
 
 interface Sensor extends Declaration {
-	name?: string
+	name: string
 }
 
 interface Func extends Declaration {
 	parameter: Parameter[]
-	name?: string
+	name: string
 	typeReturn?: Type
 	instruction: Instruction
 }
 
-interface Parameter {
-	^type?: @Type
-	name?: string
+interface Parameter extends Variable{
 }
 
 interface SensorDistance extends Sensor {
@@ -102,11 +100,12 @@ interface Assignment extends Instruction {
 }
 
 interface Return extends Instruction {
-	expression?: @Expression
+	expression?: Expression
 }
 
 interface Block extends Instruction {
-	instruction: Instruction[]
+	declarations: Declaration[]
+	instructions: Instruction[]
 }
 
 interface Forward extends Movement {
@@ -172,10 +171,10 @@ interface NumeralExpr extends Expression {
 	value: number
 }
 
-interface True extends BooleanExpr {
+interface TrueExpr extends BooleanExpr {
 }
 
-interface False extends BooleanExpr {
+interface FalseExpr extends BooleanExpr {
 }
 
 

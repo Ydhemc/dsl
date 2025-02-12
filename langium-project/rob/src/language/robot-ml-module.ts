@@ -1,7 +1,7 @@
 import { type Module, inject } from 'langium';
 import { createDefaultModule, createDefaultSharedModule, type DefaultSharedModuleContext, type LangiumServices, type LangiumSharedServices, type PartialLangiumServices } from 'langium/lsp';
 import { RobotMLGeneratedModule, RobotMLGeneratedSharedModule } from './generated/module.js';
-import { RobotMLValidator } from './robot-ml-validator.js';
+import { registerValidationChecks, RobotMLValidator } from './robot-ml-validator.js';
 
 /**
  * Declaration of custom services - add your own service classes here.
@@ -58,7 +58,7 @@ export function createRobotMLServices(context: DefaultSharedModuleContext): {
         RobotMLModule
     );
     shared.ServiceRegistry.register(RobotML);
-    //registerValidationChecks(RobotML);
+    registerValidationChecks(RobotML);
     if (!context.connection) {
         // We don't run inside a language server
         // Therefore, initialize the configuration provider instantly

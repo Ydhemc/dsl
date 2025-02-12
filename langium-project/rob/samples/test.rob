@@ -1,11 +1,27 @@
-var bool hell
+var real: mm hell;
+var real: km x;
 
-bool hello(){
-    if ( hell == (hell + 2) ) {
-        return
-    } else return;
-    if (hell == hell + 3){
-        return
+bool Hello(){
+    if (true) return;
+    if ((hell == hell + 2 * 1000) && (hell != 2) && true) {
+        return false;
     }
+    if (true && false){
+        return true;
+    }
+    if((x == 2) && (x != 1)){
+
+    }
+    loop((x == 2) && (x != 1)){
+        var bool y;
+        var real: mm l;
+        y = true;
+        loop(y) Hello();
+    }
+}
+
+ILoveThisCode(bool a, real: mm v){
+    a = false;
+    ILoveThisCode(a, v+1);
 }
 

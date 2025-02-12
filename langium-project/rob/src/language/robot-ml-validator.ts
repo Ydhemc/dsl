@@ -1,19 +1,19 @@
-// import type { ValidationAcceptor, ValidationChecks } from 'langium';
-// import type { RobotMLAstType } from './generated/ast.js';
-// import type { RobotMLServices } from './robot-ml-module.js';
+import type { ValidationAcceptor, ValidationChecks } from 'langium';
+import type { Func, RobotMLAstType } from './generated/ast.js';
+import type { RobotMLServices } from './robot-ml-module.js';
 
 /**
  * Register custom validation checks.
- *
-export function registerValidationChecks(services: RobotMlServices) {
+ */
+export function registerValidationChecks(services: RobotMLServices) {
     const registry = services.validation.ValidationRegistry;
-    const validator = services.validation.RobotMlValidator;
-    const checks: ValidationChecks<RobotMlAstType> = {
-        Person: validator.checkPersonStartsWithCapital
+    const validator = services.validation.RobotMLValidator;
+    const checks: ValidationChecks<RobotMLAstType> = {
+        Func: validator.checkFuncFirstCharLowercase
     };
     registry.register(checks, validator);
 }
-*/
+
 
 
 /**
@@ -21,14 +21,12 @@ export function registerValidationChecks(services: RobotMlServices) {
  */
 export class RobotMLValidator {
 
-    /*
-    checkPersonStartsWithCapital(person: Person, accept: ValidationAcceptor): void {
-        if (person.name) {
-            const firstChar = person.name.substring(0, 1);
-            if (firstChar.toUpperCase() !== firstChar) {
-                accept('warning', 'Person name should start with a capital.', { node: person, property: 'name' });
-            }
+    
+    checkFuncFirstCharLowercase(func: Func, accept: ValidationAcceptor): void {
+        const firstChar = func.name.substring(0, 1)
+        if (firstChar.toLowerCase() != firstChar) {
+            accept('warning', 'Func name should be CamelCase.', { node: func, property: 'name' });
         }
-    }*/
+    }
 
 }

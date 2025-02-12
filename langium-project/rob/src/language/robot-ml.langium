@@ -3,15 +3,17 @@ import 'Terminals'
 import 'roboML-types'
 
 entry RobotProgram returns RobotProgram: 
-    {RobotProgram} (declaration+=Declaration  ( declaration+=Declaration  )*)? (instruction+=Instruction  (";" instruction+=Instruction  )*)?
+    {RobotProgram} (declarations+=Declaration  )* (instructions+=Instruction)*
 ;
 
 Declaration returns Declaration:
-    Func | Variable | Sensor 
+    (Func) |
+    (( Variable | Sensor ) ';')
 ;
 
 Instruction returns Instruction:
-    Loop | Condition | Call | Assignment | Return | Block | Forward | Rotate | Left | Backward | Right | Speed 
+    ((Call | Assignment | Return | Forward | Rotate | Left | Backward | Right | Speed ) ';' )
+    | (Block | Loop | Condition)
 ;
 
 Expression returns Expression:
@@ -28,16 +30,15 @@ BooleanExpr returns BooleanExpr:
     | {BinaryBool}  expressionL=ArithmeticExpr operation=BoolOperation_SUP_EQ expressionR=ArithmeticExpr
     | {BinaryBool}  expressionL=ArithmeticExpr operation=BoolOperation_EQ expressionR=ArithmeticExpr
     | {BinaryBool}  expressionL=ArithmeticExpr operation=BoolOperation_NEQ expressionR=ArithmeticExpr
-    | Not
     | FactorBool
 ;
 
 FactorBool returns BooleanExpr:
-    PrimaryBool
+    PrimaryBool | Not
 ;
 
 PrimaryBool returns BooleanExpr:
-    True | False | VarExpr | CallExpr | '(' BooleanExpr ')' | SensorExpr
+    TrueExpr | FalseExpr | VarExpr | CallExpr | '(' BooleanExpr ')' | SensorExpr
 ;
 
 ArithmeticExpr returns Expression:
@@ -60,10 +61,6 @@ Type returns Type:
     Bool | Real 
 ;
 
-// BooleanExpr returns BooleanExpr:
-//     Not | BinaryBool 
-// ;
-
 Sensor returns Sensor:
     SensorDistance | SensorTime 
 ;
@@ -85,7 +82,7 @@ SensorTime returns SensorTime:
 ;
 
 Parameter returns Parameter:
-    {Parameter} 'Parameter' name=EString  '{' ('type' ^type=[Type:EString ] )? '}'  
+    {Parameter} ^type=Type name=EString
 ;
 
 EString returns string:
@@ -126,15 +123,15 @@ Call returns Call:
 ;
 
 Assignment returns Assignment:
-    {Assignment} ('variable' variable=[Variable:EString ] ) '=' (expression=Expression  )
+    {Assignment} variable=[Variable:EString ] '=' expression=Expression
 ;
 
 Return returns Return:
-    {Return} 'return' ( expression=[Expression:EString ] )?
+    {Return} 'return' ( expression=Expression )?
 ;
 
 Block returns Block:
-    {Block} '{' ( instruction+=Instruction  (';' instruction+=Instruction  )* )? '}'  
+    {Block} '{' (declarations+=Declaration  )* (instructions+=Instruction)* '}'  
 ;
 
 Forward returns Forward:
@@ -162,13 +159,8 @@ Speed returns Speed:
 ;
 
 Not returns Not:
-    'Not' expression=BooleanExpr  
+    '!' expression=BooleanExpr  
 ;
-
-
-// BinaryBool returns BinaryBool:
-//     'BinaryBool' '{' ('operation' operation=BoolOperation  )? ('variable' '{' variable+=Variable  ("," variable+=Variable  )* '}' )? 'expression' '{' expression+=Expression  ("," expression+=Expression  )* '}' '}'  
-// ;
 
 BoolOperation returns BoolOperation:
     BoolOperation_INF | BoolOperation_SUP | BoolOperation_INF_EQ | BoolOperation_EQ | BoolOperation_SUP_EQ | BoolOperation_NEQ | BoolOperation_OR | BoolOperation_AND
@@ -194,17 +186,9 @@ Negative returns Negative:
     {Negative} '-' expression=ArithmeticExpr   
 ;
 
-// BinaryArithmetic returns BinaryArithmetic:
-//     {BinaryArithmetic}  expressionL=Expression (operation=ArithmeticOperation) expressionR=Expression
-// ;
-
 SensorExpr returns SensorExpr:
     {SensorExpr} sensor=[Sensor:EString ]  
 ;
-
-// ArithmeticOperation returns ArithmeticOperation:
-//     ArithmeticOperation_ADD | ArithmeticOperation_SUB | ArithmeticOperation_DIV | ArithmeticOperation_MULT
-// ;
 
 ArithmeticOperation_ADD returns ArithmeticOperation_ADD: '+' ;
 ArithmeticOperation_SUB returns ArithmeticOperation_SUB: '-' ;
@@ -212,12 +196,12 @@ ArithmeticOperation_DIV returns ArithmeticOperation_DIV: '/' ;
 ArithmeticOperation_MULT returns ArithmeticOperation_MULT: '*' ;
 
 
-True returns True:
-    {True} 'true'
+TrueExpr returns TrueExpr:
+    {TrueExpr} 'true'
 ;
 
-False returns False:
-    {False} 'False'
+FalseExpr returns FalseExpr:
+    {FalseExpr} 'false'
 ;
 
 NumeralExpr returns NumeralExpr:

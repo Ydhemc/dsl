@@ -1,0 +1,11 @@
+var bool hell
+
+bool hello(){
+    if ( hell == (hell + 2) ) {
+        return
+    } else return;
+    if (hell == hell + 3){
+        return
+    }
+}
+

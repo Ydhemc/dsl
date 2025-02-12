@@ -1,34 +1,33 @@
 
 type Unit = Unit_MM | Unit_KM | Unit_CM | Unit_M | Unit_DM | Unit_HM | Unit_DAM | Unit_RAD;
-type Unit_MM = 'MM';
-type Unit_KM = 'KM';
-type Unit_CM = 'CM';
-type Unit_M = 'M';
-type Unit_DM = 'DM';
-type Unit_HM = 'HM';
-type Unit_DAM = 'DAM';
-type Unit_RAD = 'RAD';
+type Unit_MM = 'mm';
+type Unit_KM = 'km';
+type Unit_CM = 'cm';
+type Unit_M = 'm';
+type Unit_DM = 'dm';
+type Unit_HM = 'hm';
+type Unit_DAM = 'dam';
+type Unit_RAD = 'rad';
 
 type BoolOperation = BoolOperation_INF | BoolOperation_SUP | BoolOperation_INF_EQ | BoolOperation_EQ | BoolOperation_SUP_EQ | BoolOperation_NEQ | BoolOperation_OR | BoolOperation_AND;
-type BoolOperation_INF = 'INF';
-type BoolOperation_SUP = 'SUP';
-type BoolOperation_INF_EQ = 'INF_EQ';
-type BoolOperation_EQ = 'EQ';
-type BoolOperation_SUP_EQ = 'SUP_EQ';
-type BoolOperation_NEQ = 'NEQ';
-type BoolOperation_OR = 'OR';
-type BoolOperation_AND = 'AND';
+type BoolOperation_INF = '<';
+type BoolOperation_SUP = '>';
+type BoolOperation_INF_EQ = '<=';
+type BoolOperation_EQ = '==';
+type BoolOperation_SUP_EQ = '>=';
+type BoolOperation_NEQ = '!=';
+type BoolOperation_OR = '||';
+type BoolOperation_AND = '&&';
 
 type ArithmeticOperation = ArithmeticOperation_ADD | ArithmeticOperation_SUB | ArithmeticOperation_DIV | ArithmeticOperation_MULT;
-type ArithmeticOperation_ADD = 'ADD';
-type ArithmeticOperation_SUB = 'SUB';
-type ArithmeticOperation_DIV = 'DIV';
-type ArithmeticOperation_MULT = 'MULT';
+type ArithmeticOperation_ADD = '+';
+type ArithmeticOperation_SUB = '-';
+type ArithmeticOperation_DIV = '/';
+type ArithmeticOperation_MULT = '*';
 
 interface RobotProgram {
 	declaration: Declaration[]
 	instruction: Instruction[]
-	expression: Expression[]
 }
 
 interface Declaration {
@@ -42,7 +41,7 @@ interface Expression {
 }
 
 interface Variable extends Declaration {
-	^type?: @Type
+	^type?: Type
 	name?: string
 }
 
@@ -56,10 +55,11 @@ interface Sensor extends Declaration {
 	name?: string
 }
 
-interface Fonction extends Declaration {
-	parameter: @Parameter[]
+interface Func extends Declaration {
+	parameter: Parameter[]
 	name?: string
-	typeReturn?: @Type
+	typeReturn?: Type
+	instruction: Instruction
 }
 
 interface Parameter {
@@ -82,7 +82,7 @@ interface Real extends Type {
 
 interface Loop extends Instruction {
 	booleanexpr?: BooleanExpr
-	instruction: Instruction[]
+	instruction: Instruction
 }
 
 interface Condition extends Instruction {
@@ -92,8 +92,8 @@ interface Condition extends Instruction {
 }
 
 interface Call extends Instruction {
-	parameters: @Expression[]
-	fonction?: @Fonction
+	parameters: Expression[]
+	fonction?: @Func
 }
 
 interface Assignment extends Instruction {
@@ -113,7 +113,7 @@ interface Forward extends Movement {
 }
 
 interface Movement extends Instruction {
-	parameters?: Expression
+	parameter: Expression
 }
 
 interface Rotate extends Movement {
@@ -129,21 +129,22 @@ interface Right extends Movement {
 }
 
 interface Speed extends Instruction {
-	parameters?: Expression
+	parameter?: Expression
 }
 
 interface Not extends Expression, BooleanExpr {
-	expression: Expression
+	expression: BooleanExpr
 }
 
 interface BinaryBool extends Expression, BooleanExpr {
 	operation?: BoolOperation
-	expression: Expression[]
+	expressionL: Expression
+	expressionR: Expression
 }
 
 interface CallExpr extends Expression {
 	parameters: Expression[]
-	fonction?: @Fonction
+	fonction?: @Func
 }
 
 interface VarExpr extends Expression {
@@ -159,10 +160,22 @@ interface ArithmeticExpr extends Expression {
 
 interface BinaryArithmetic extends ArithmeticExpr {
 	operation?: ArithmeticOperation
-	expression: Expression[]
+	expressionL: Expression
+	expressionR: Expression
 }
 
 interface SensorExpr extends Expression {
 	sensor?: @Sensor
 }
+
+interface NumeralExpr extends Expression {
+	value: number
+}
+
+interface True extends BooleanExpr {
+}
+
+interface False extends BooleanExpr {
+}
+
 

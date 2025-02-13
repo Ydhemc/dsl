@@ -1,5 +1,5 @@
 import { ArithmeticExpr, Assignment, Backward, BinaryArithmetic, BinaryBool, Block, Bool, BooleanExpr, Call, CallExpr, Condition, Declaration, Expression, FalseExpr, Forward, Func, Instruction, Left, Loop, Movement, Negative, Not, NumeralExpr, Parameter, Real, Return, Right, RobotMLVisitor, RobotProgram, Rotate, Sensor, SensorDistance, SensorExpr, SensorTime, Speed, TrueExpr, Type, VarExpr, Variable } from "../semantics/robot-ml-visitor.js";
-import { expandToNode, toString } from 'langium/generate';
+import { CompositeGeneratorNode, expandToNode, joinToNode, toString } from 'langium/generate';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { extractDestinationAndName } from '../cli/cli-util.js';
@@ -9,32 +9,6 @@ export function generateArduino(model: RobotProgram, filePath: string, destinati
     const generatedFilePath = `${path.join(data.destination, data.name)}.ino`;
 
     const fileNode = expandToNode`        
-        #include <PinChangeInt.h>
-        #include <PinChangeIntConfig.h>
-        #include <EEPROM.h>
-        #define _NAMIKI_MOTOR	 //for Namiki 22CL-103501PG80:1
-        #include <fuzzy_table.h>
-        #include <PID_Beta6.h>
-        #include <MotorWheel.h>
-        #include <Omni4WD.h>
-
-        irqISR(irq1, isr1);
-        MotorWheel wheel1(3, 2, 4, 5, &irq1);
-
-        irqISR(irq2, isr2);
-        MotorWheel wheel2(11, 12, 14, 15, &irq2);
-
-        irqISR(irq3, isr3);
-        MotorWheel wheel3(9, 8, 16, 17, &irq3);
-
-        irqISR(irq4, isr4);
-        MotorWheel wheel4(10, 7, 18, 19, &irq4);
-        void setup() {
-            TCCR1B = TCCR1B & 0xf8 | 0x01; // Pin9,Pin10 PWM 31250Hz
-            TCCR2B = TCCR2B & 0xf8 | 0x01; // Pin3,Pin11 PWM 31250Hz
-            Omni.PIDEnable(0.31, 0.01, 0, 10);
-        }
-        void loop() {
 
     `.appendNewLineIfNotEmpty();
 
@@ -48,6 +22,57 @@ export function generateArduino(model: RobotProgram, filePath: string, destinati
 
 export class RobotVisitorImpl implements RobotMLVisitor {
 
+    private declarationNode: CompositeGeneratorNode;
+    private setupNode: CompositeGeneratorNode;
+    private loopNode: CompositeGeneratorNode;
+
+
+    public constructor() {
+        this.declarationNode = expandToNode``
+        this.setupNode = expandToNode``
+        this.loopNode = expandToNode``
+    } 
+
+    public getFileNode(): CompositeGeneratorNode {
+        const fileNode = expandToNode`
+        #include <PinChangeInt.h>
+        #include <PinChangeIntConfig.h>
+        #include <EEPROM.h>
+        #define _NAMIKI_MOTOR	 //for Namiki 22CL-103501PG80:1
+        #include <fuzzy_table.h>
+        #include <PID_Beta6.h>
+        #include <MotorWheel.h>
+        #include <Omni4WD.h>
+        ${joinToNode(toString(this.declarationNode), value => `${value}`, { appendNewLineIfNotEmpty: true })}
+
+        irqISR(irq1, isr1);
+        MotorWheel wheel1(3, 2, 4, 5, &irq1);
+
+        irqISR(irq2, isr2);
+        MotorWheel wheel2(11, 12, 14, 15, &irq2);
+
+        irqISR(irq3, isr3);
+        MotorWheel wheel3(9, 8, 16, 17, &irq3);
+
+        irqISR(irq4, isr4);
+        MotorWheel wheel4(10, 7, 18, 19, &irq4);
+
+
+        Omni4WD Omni(&wheel1, &wheel2, &wheel3, &wheel4);
+
+        void setup() {
+            TCCR1B = TCCR1B & 0xf8 | 0x01; // Pin9,Pin10 PWM 31250Hz
+            TCCR2B = TCCR2B & 0xf8 | 0x01; // Pin3,Pin11 PWM 31250Hz
+            ${joinToNode(toString(this.setupNode), value => `${value}`, { appendNewLineIfNotEmpty: true })}
+            Omni.PIDEnable(0.31, 0.01, 0, 10);
+        }
+
+        void loop() {
+            ${joinToNode(toString(this.loopNode), value => `${value}`, { appendNewLineIfNotEmpty: true })}
+        }
+        `
+        return fileNode
+    }
 
     visitRobotProgram(node: RobotProgram) {
         throw new Error("Method not implemented.");

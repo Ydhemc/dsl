@@ -74,7 +74,19 @@ export class RobotVisitorImpl implements RobotMLVisitor {
     }
 
     visitRobotProgram(node: RobotProgram) {
-        throw new Error("Method not implemented.");
+        this.visitDeclarations(node.declarations)
+    }
+
+    visitDeclarations(declarations: Declaration[]){
+        declarations.forEach(element => {
+            element.accept(this)
+        });
+    }
+
+    visitInstructions(instructions: Instruction[]){
+        instructions.forEach(element => {
+            element.accept(this)
+        })
     }
 
     visitDeclaration(node: Declaration) {

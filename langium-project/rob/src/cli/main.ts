@@ -1,4 +1,5 @@
-import type { RobotProgram } from '../language/generated/ast.js';
+import * as ASTInterfaces from '../language/generated/ast.js';
+import type { RobotProgram } from '../semantics/robot-ml-visitor.js';
 import chalk from 'chalk';
 import { Command } from 'commander';
 import { RobotMLLanguageMetaData } from '../language/generated/module.js';
@@ -16,9 +17,9 @@ const packageContent = await fs.readFile(packagePath, 'utf-8');
 
 export const generateAction = async (fileName: string, opts: GenerateOptions): Promise<void> => {
     const services = createRobotMLServices(NodeFileSystem).RobotML;
-    const model = await extractAstNode<RobotProgram>(fileName, services);
-    const generatedFilePath = generateArduino(model, fileName, opts.destination);
-    console.log(chalk.green(`JavaScript code generated successfully: ${generatedFilePath}`));
+    const model = await extractAstNode<ASTInterfaces.RobotProgram>(fileName, services);
+    const generatedFilePath = generateArduino((model as RobotProgram), fileName, opts.destination);
+    console.log(chalk.green(`Arduino code generated successfully: ${generatedFilePath}`));
 };
 
 export type GenerateOptions = {
@@ -32,7 +33,7 @@ export default function(): void {
 
     const fileExtensions = RobotMLLanguageMetaData.fileExtensions.join(', ');
     program
-        .command('robc')
+        .command('compile')
         .argument('<file>', `source file (possible file extensions: ${fileExtensions})`)
         .option('-d, --destination <dir>', 'destination directory of generating')
         .description('generates Arduino code')

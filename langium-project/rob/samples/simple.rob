@@ -1,0 +1,6 @@
+var bool x;
+
+x = true;
+
+Forward x;
+

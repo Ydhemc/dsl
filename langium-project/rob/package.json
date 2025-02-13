@@ -23,7 +23,8 @@
         "dev:debug": "vite --debug --force",
         "serve": "npm run dev",
         "test": "vitest run",
-        "langium:visitor": "langium-visitor"
+        "langium:visitor": "langium-visitor",
+        "robc": "node bin/cli.js compile"
     },
     "dependencies": {
         "@codingame/monaco-vscode-editor-service-override": "~3.2.3",

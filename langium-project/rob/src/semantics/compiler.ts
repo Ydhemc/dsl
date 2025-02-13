@@ -8,14 +8,13 @@ export function generateArduino(model: RobotProgram, filePath: string, destinati
     const data = extractDestinationAndName(filePath, destination);
     const generatedFilePath = `${path.join(data.destination, data.name)}.ino`;
 
-    const fileNode = expandToNode`        
-
-    `.appendNewLineIfNotEmpty();
+    const visitor = new RobotVisitorImpl()
+    model.accept(visitor)
 
     if (!fs.existsSync(data.destination)) {
         fs.mkdirSync(data.destination, { recursive: true });
     }
-    fs.writeFileSync(generatedFilePath, toString(fileNode));
+    fs.writeFileSync(generatedFilePath, toString(visitor.getFileNode()));
     return generatedFilePath;
 }
 

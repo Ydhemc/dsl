@@ -115,7 +115,7 @@ Loop returns Loop:
 ;
 
 Condition returns Condition:
-    {Condition} 'if' '(' booleanexpr=BooleanExpr ')' if=Instruction   ('else' else=Instruction  )?  
+    {Condition} 'if' '(' booleanexpr=BooleanExpr ')' ifInstr=Instruction   ('else' elseInstr=Instruction  )?  
 ;
 
 Call returns Call:

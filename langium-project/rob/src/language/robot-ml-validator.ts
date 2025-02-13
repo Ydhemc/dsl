@@ -88,9 +88,9 @@ export class RobotMLValidator {
     }
 
     checkConditionHasBody(condition: Condition, accept: ValidationAcceptor): void {
-        const ifInst = condition.if
+        const ifInst = condition.ifInstr
         if(ifInst.$type == Block &&  (ifInst as Block).instructions.length == 0){
-            accept('error', 'If must have a body', {node: condition, property: 'if'})
+            accept('error', 'If must have a body', {node: condition, property: 'ifInstr'})
         }
     }
 

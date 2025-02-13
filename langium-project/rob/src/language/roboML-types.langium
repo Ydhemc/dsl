@@ -84,8 +84,8 @@ interface Loop extends Instruction {
 
 interface Condition extends Instruction {
 	booleanexpr: BooleanExpr
-	if: Instruction
-	else?: Instruction
+	ifInstr: Instruction
+	elseInstr?: Instruction
 }
 
 interface Call extends Instruction {

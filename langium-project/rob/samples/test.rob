@@ -2,9 +2,12 @@ var real: mm hell;
 var real: km x;
 
 bool Hello(){
-    if (true) return;
+    if (false) return;
     if ((hell == hell + 2 * 1000) && (hell != 2) && true) {
         return false;
+    }
+    if (true) {
+        return true;
     }
     if (true && false){
         return true;
@@ -12,15 +15,19 @@ bool Hello(){
     if((x == 2) && (x != 1)){
 
     }
+    loop (true) {}
     loop((x == 2) && (x != 1)){
         var bool y;
         var real: mm l;
         y = true;
         loop(y) Hello();
     }
+    Forward 2;
+    x = 2 * 3 +1;
 }
 
 iLoveThisCode(bool a, real: mm v){
+    var bool Dodo;
     a = false;
     iLoveThisCode(a, v+1);
 }

@@ -37,7 +37,6 @@ interface Instruction {
 }
 
 interface Expression {
-	variable: Variable[]
 }
 
 interface Variable extends Declaration {
@@ -79,13 +78,13 @@ interface Real extends Type {
 }
 
 interface Loop extends Instruction {
-	booleanexpr?: BooleanExpr
+	booleanexpr: BooleanExpr
 	instruction: Instruction
 }
 
 interface Condition extends Instruction {
-	booleanexpr?: BooleanExpr
-	if?: Instruction
+	booleanexpr: BooleanExpr
+	if: Instruction
 	else?: Instruction
 }
 

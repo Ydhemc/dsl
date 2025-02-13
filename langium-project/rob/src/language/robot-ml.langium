@@ -42,14 +42,14 @@ PrimaryBool returns BooleanExpr:
 ;
 
 ArithmeticExpr returns Expression:
-    {BinaryArithmetic}  expressionL=FactorAri operation=ArithmeticOperation_ADD expressionR=ArithmeticExpr
-    | {BinaryArithmetic}  expressionL=FactorAri operation=ArithmeticOperation_SUB expressionR=ArithmeticExpr
+    {BinaryArithmetic}  expressionL=FactorAri operation=ArithmeticOperation_ADD expressionR=FactorAri
+    | {BinaryArithmetic}  expressionL=FactorAri operation=ArithmeticOperation_SUB expressionR=FactorAri
     | FactorAri
 ;
 
 FactorAri returns Expression:
-    {BinaryArithmetic}  expressionL=PrimaryAri operation=ArithmeticOperation_MULT expressionR=ArithmeticExpr
-    | {BinaryArithmetic}  expressionL=PrimaryAri operation=ArithmeticOperation_DIV expressionR=ArithmeticExpr
+    {BinaryArithmetic}  expressionL=PrimaryAri operation=ArithmeticOperation_MULT expressionR=PrimaryAri
+    | {BinaryArithmetic}  expressionL=PrimaryAri operation=ArithmeticOperation_DIV expressionR=PrimaryAri
     | PrimaryAri
 ;
 

@@ -1,0 +1,54 @@
+var real: mm hell;
+var real: km x;
+
+bool Hello(){
+    if (true) return;
+    if ((hell == hell + 2 * 1000) && (hell != 2) && true) {
+        return false;
+    }
+    if (true && false){
+        return true;
+    }
+    if((x == 2) && (x != 1)){
+
+    }
+    loop((x == 2) && (x != 1)){
+        var bool y;
+        var real: mm l;
+        y = true;
+        loop(y) Hello();
+    }
+}
+
+bool hello(bool a, bool a){
+    if (true) return;
+    if ((hell == hell + 2 * 1000) && (hell != 2) && true) {
+        return false;
+    }
+    if (true && false){
+        return true;
+    }
+    if((x == 2) && (x != 1)){
+
+    }
+    loop((x == 2) && (x != 1)){
+        var bool y;
+        var real: mm l;
+        y = true;
+        loop(y) Hello();
+    }
+}
+
+bool hello(){
+
+}
+var real: mm b ;
+
+bool test(real: mm v) Forward b ;
+
+
+iLoveThisCode(bool a, real: mm v){
+    a = false;
+    iLoveThisCode(a, v+1);
+}
+

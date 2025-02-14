@@ -3,6 +3,7 @@ import { CompositeGeneratorNode, expandToNode, joinToNode, toString } from 'lang
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { extractDestinationAndName } from '../cli/cli-util.js';
+import { isBackward, isForward, isLeft, isMovement, isRight, isRotate } from "../language/generated/ast.js";
 
 export function generateArduino(model: RobotProgram, filePath: string, destination: string | undefined): string {
     const data = extractDestinationAndName(filePath, destination);
@@ -21,15 +22,17 @@ export function generateArduino(model: RobotProgram, filePath: string, destinati
 
 export class RobotVisitorImpl implements RobotMLVisitor {
 
-    private declarationNode: CompositeGeneratorNode;
-    private setupNode: CompositeGeneratorNode;
-    private loopNode: CompositeGeneratorNode;
+    declarationNode: CompositeGeneratorNode;
+    setupNode: CompositeGeneratorNode;
+    loopNode: CompositeGeneratorNode;
+    currentType?: Type
 
 
     public constructor() {
         this.declarationNode = expandToNode``
         this.setupNode = expandToNode``
         this.loopNode = expandToNode``
+        this.currentType = undefined
     } 
 
     public getFileNode(): CompositeGeneratorNode {
@@ -93,6 +96,12 @@ export class RobotVisitorImpl implements RobotMLVisitor {
         //throw new Error("Method not implemented.");
     }
 
+    visitInstruction(node: Instruction) {
+        if(isMovement(node)){
+            (node as Instruction).accept(this)
+        }
+    }
+
     visitFunc(node: Func) {
         //throw new Error("Method not implemented.");
     }
@@ -151,9 +160,6 @@ export class RobotVisitorImpl implements RobotMLVisitor {
     visitVarExpr(node: VarExpr) {
         throw new Error("Method not implemented.");
     }
-    visitInstruction(node: Instruction) {
-        throw new Error("Method not implemented.");
-    }
     visitAssignment(node: Assignment) {
         throw new Error("Method not implemented.");
     }
@@ -170,13 +176,27 @@ export class RobotVisitorImpl implements RobotMLVisitor {
         throw new Error("Method not implemented.");
     }
     visitMovement(node: Movement) {
-        throw new Error("Method not implemented.");
+        if(isForward(node)){
+            (node as Forward).accept(this)
+        }
+        if(isBackward(node)){
+            (node as Backward).accept(this)
+        }
+        if(isRotate(node)){
+            (node as Rotate).accept(this)
+        }
+        if(isLeft(node)){
+            (node as Left).accept(this)
+        }
+        if(isRight(node)){
+            (node as Right).accept(this)   
+        }
     }
     visitBackward(node: Backward) {
         throw new Error("Method not implemented.");
     }
     visitForward(node: Forward) {
-        throw new Error("Method not implemented.");
+        node.parameter.accept(this)
     }
     visitLeft(node: Left) {
         throw new Error("Method not implemented.");

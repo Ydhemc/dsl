@@ -3,7 +3,7 @@ import { CompositeGeneratorNode, expandToNode, toString } from 'langium/generate
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { extractDestinationAndName } from '../cli/cli-util.js';
-import { isBackward, isBool, isForward, isLeft, isMovement, isReal, isRight, isRotate} from "../language/generated/ast.js";
+import { isBool, isReal, Unit} from "../language/generated/ast.js";
 
 export function generateArduino(model: RobotProgram, filePath: string, destination: string | undefined): string {
     const data = extractDestinationAndName(filePath, destination);
@@ -26,6 +26,7 @@ export class RobotVisitorImpl implements RobotMLVisitor {
     setupNode: CompositeGeneratorNode;
     loopNode: CompositeGeneratorNode;
     currentType?: Type
+    currentExprStr: string
 
     parametre = "";
     para = false;
@@ -34,8 +35,38 @@ export class RobotVisitorImpl implements RobotMLVisitor {
         this.declarationNode = expandToNode``
         this.setupNode = expandToNode``
         this.loopNode = expandToNode``
-        this.currentType = undefined
+        this.currentType = new Real('Real', 'mm') //undefined
+        this.currentExprStr = ""
     } 
+
+    private requireType(requiredType: string, message: string){
+        if(this.currentType?.$type != requiredType){
+            throw new Error("The type should be ["+requiredType+"] for : "+message)
+        }
+    }
+
+    /*private requireBool(message: string){
+        this.requireType('Bool', message)
+    }
+
+    private requireRealOfUnit(unit: Unit, message: string){
+        if(this.currentType?.$type != 'Real' || (this.currentType as Real).unit != unit){
+            throw new Error("The type should be [Real in "+unit+"] for : "+message)
+        }
+    }*/
+
+    private requireRealAnyDistUnit(message: string): Unit{
+        console.log("type is "+this.currentType)
+        if(this.currentType?.$type != 'Real' || (this.currentType as Real).unit == 'rad'){
+            throw new Error("The type should be [Real (not in rad)] for : "+message)
+        }
+        return (this.currentType as Real).unit
+    }
+
+    private requireRealAnyUnit(message: string): Unit{
+        this.requireType('Real', message)
+        return (this.currentType as Real).unit
+    }
 
     public getFileNode(): CompositeGeneratorNode {
         const fileNode = expandToNode`
@@ -48,7 +79,6 @@ export class RobotVisitorImpl implements RobotMLVisitor {
         #include <MotorWheel.h>
         #include <Omni4WD.h>
         `.append(this.declarationNode).append(expandToNode`
-
 
         irqISR(irq1, isr1);
         MotorWheel wheel1(3, 2, 4, 5, &irq1);
@@ -64,7 +94,7 @@ export class RobotVisitorImpl implements RobotMLVisitor {
 
 
         Omni4WD Omni(&wheel1, &wheel2, &wheel3, &wheel4);
-        bool isDone = false;
+        bool __isDone = false;
 
         void setup() {
             TCCR1B = TCCR1B & 0xf8 | 0x01; // Pin9,Pin10 PWM 31250Hz
@@ -75,12 +105,12 @@ export class RobotVisitorImpl implements RobotMLVisitor {
         }
 
         void loop() {
-            if(!isDone){
+            if(!__isDone){
             `).append(this.loopNode)
         .append(expandToNode`
-            isDone = true;
+            __isDone = true;
             } else {
-                Omni.setCarStop(0); // You should fix the lib because ms the parameter may be useless
+                Omni.setCarSlow2Stop(1000)
             }
         }`)
         return fileNode
@@ -89,6 +119,7 @@ export class RobotVisitorImpl implements RobotMLVisitor {
 
     visitRobotProgram(node: RobotProgram) {
         this.visitDeclarations(node.declarations)
+        this.visitInstructions(node.instructions)
     }
 
     visitDeclarations(declarations: Declaration[]){
@@ -108,9 +139,7 @@ export class RobotVisitorImpl implements RobotMLVisitor {
     }
 
     visitInstruction(node: Instruction) {
-        if(isMovement(node)){
-            (node as Instruction).accept(this)
-        }
+        //throw new Error("Method not implemented.");
     }
 
     visitFunc(node: Func) {
@@ -118,10 +147,10 @@ export class RobotVisitorImpl implements RobotMLVisitor {
         this.para=true;
         node.parameter.forEach((para, i) => {if(i>0){this.parametre+=", "}; para.accept(this)},)
         this.declarationNode.append(` 
-${(node.typeReturn == undefined ? "void " : node.typeReturn.$type+" ") }${node.name} (${this.parametre}){
+        ${(node.typeReturn == undefined ? "void " : node.typeReturn.$type+" ") }${node.name} (${this.parametre}){
             
-}
-`)
+        }
+        `)
         this.para=false;
         this.parametre="";
     }
@@ -206,42 +235,56 @@ ${(node.typeReturn == undefined ? "void " : node.typeReturn.$type+" ") }${node.n
         throw new Error("Method not implemented.");
     }
     visitMovement(node: Movement) {
-        if(isForward(node)){
-            (node as Forward).accept(this)
-        }
-        if(isBackward(node)){
-            (node as Backward).accept(this)
-        }
-        if(isRotate(node)){
-            (node as Rotate).accept(this)
-        }
-        if(isLeft(node)){
-            (node as Left).accept(this)
-        }
-        if(isRight(node)){
-            (node as Right).accept(this)   
-        }
+        throw new Error("Method not implemented.");
     }
+
+    private surroundWithDistanceLoop(distanceExpr: Expression, action: string){
+        distanceExpr.accept(this)
+        this.requireRealAnyDistUnit("linear movement")
+        this.loopNode.append(`
+            unsigned long __duration = 1000*( Omni.getSpeedMMPS() * ${this.currentExprStr});
+            unsigned long __begin = millis();
+            while((millis() - __begin) < __duration){${action};}`).appendNewLine()
+    }
+
     visitBackward(node: Backward) {
-        throw new Error("Method not implemented.");
+        this.surroundWithDistanceLoop(node.parameter, "Omni.setCarBackoff(Omni.getCarSpeedMMPS())")
     }
+
     visitForward(node: Forward) {
-        node.parameter.accept(this)
+        this.surroundWithDistanceLoop(node.parameter, "Omni.setCarAdvance(Omni.getCarSpeedMMPS())")
     }
+
     visitLeft(node: Left) {
-        throw new Error("Method not implemented.");
+        this.surroundWithDistanceLoop(node.parameter, "Omni.setCarLeft(Omni.getCarSpeedMMPS())")
     }
     visitRight(node: Right) {
-        throw new Error("Method not implemented.");
+        this.surroundWithDistanceLoop(node.parameter, "Omni.setCarRight(Omni.getCarSpeedMMPS())")
     }
-    visitRotate(node: Rotate) {
-        throw new Error("Method not implemented.");
+    visitRotate(node: Rotate) { //OMEGA = dteta/dt rad/s avec dteta rapport d'angle parcouru et dt rapport de temps
+        node.parameter.accept(this)
+        let unit = this.requireRealAnyUnit("angular movement")
+        if(unit == 'rad'){
+            throw new Error("Rotation with radians not implemented yet")
+        }else {
+            this.loopNode.append(`
+            int __rota = ${this.currentExprStr};
+            unsigned long __duration = 1000*( Omni.getSpeedMMPS() * __rota);
+            unsigned long __begin = millis();
+            while((millis() - __begin) < __duration){
+                if(__rota < 0) Omni.setCarRotateLeft(Omni.getSpeedMMPS());
+                else Omni.setCarRotateRight(Omni.getSpeedMMPS());
+            }`).appendNewLine()
+        }
     }
     visitReturn(node: Return) {
         throw new Error("Method not implemented.");
     }
     visitSpeed(node: Speed) {
-        throw new Error("Method not implemented.");
+        node.parameter.accept(this) // expression
+        this.requireRealAnyUnit("speed")
+        this.loopNode.append(`
+            Omni.setCarSpeedMMPS(${this.currentExprStr});`).appendNewLine()
     }
     visitType(node: Type) {
         if(isBool(node)) (node as Bool).accept(this);
@@ -268,4 +311,3 @@ ${node.$type} `)
     }
     
 }
-

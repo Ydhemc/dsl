@@ -1,5 +1,5 @@
 import { ArithmeticExpr, Assignment, Backward, BinaryArithmetic, BinaryBool, Block, Bool, BooleanExpr, Call, CallExpr, Condition, Declaration, Expression, FalseExpr, Forward, Func, Instruction, Left, Loop, Movement, Negative, Not, NumeralExpr, Parameter, Real, Return, Right, RobotMLVisitor, RobotProgram, Rotate, Sensor, SensorDistance, SensorExpr, SensorTime, Speed, TrueExpr, Type, VarExpr, Variable } from "../semantics/robot-ml-visitor.js";
-import { CompositeGeneratorNode, expandToNode, joinToNode, toString } from 'langium/generate';
+import { CompositeGeneratorNode, expandToNode, toString } from 'langium/generate';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { extractDestinationAndName } from '../cli/cli-util.js';
@@ -45,7 +45,7 @@ export class RobotVisitorImpl implements RobotMLVisitor {
         #include <PID_Beta6.h>
         #include <MotorWheel.h>
         #include <Omni4WD.h>
-        ${joinToNode(toString(this.declarationNode), value => `${value}`, { appendNewLineIfNotEmpty: true })}
+        `.append(this.declarationNode).append(expandToNode`
 
         irqISR(irq1, isr1);
         MotorWheel wheel1(3, 2, 4, 5, &irq1);
@@ -61,18 +61,25 @@ export class RobotVisitorImpl implements RobotMLVisitor {
 
 
         Omni4WD Omni(&wheel1, &wheel2, &wheel3, &wheel4);
+        bool isDone = false;
 
         void setup() {
             TCCR1B = TCCR1B & 0xf8 | 0x01; // Pin9,Pin10 PWM 31250Hz
             TCCR2B = TCCR2B & 0xf8 | 0x01; // Pin3,Pin11 PWM 31250Hz
-            ${joinToNode(toString(this.setupNode), value => `${value}`, { appendNewLineIfNotEmpty: true })}
+        `).append(this.setupNode)
+        .append(expandToNode`
             Omni.PIDEnable(0.31, 0.01, 0, 10);
         }
 
         void loop() {
-            ${joinToNode(toString(this.loopNode), value => `${value}`, { appendNewLineIfNotEmpty: true })}
-        }
-        `
+            if(!isDone){
+            `).append(this.loopNode)
+        .append(expandToNode`
+            isDone = true;
+            } else {
+                Omni.setCarStop(0); // You should fix the lib because ms the parameter may be useless
+            }
+        }`)
         return fileNode
     }
 
@@ -196,6 +203,7 @@ export class RobotVisitorImpl implements RobotMLVisitor {
         throw new Error("Method not implemented.");
     }
     visitForward(node: Forward) {
+
         node.parameter.accept(this)
     }
     visitLeft(node: Left) {

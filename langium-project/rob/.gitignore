@@ -4,5 +4,6 @@
 !.vscode/tasks.json
 node_modules/
 out/
+arduino_out
 src/language/generated/
 syntaxes/

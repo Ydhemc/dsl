@@ -90,39 +90,39 @@ export class RobotVisitorImpl implements RobotMLVisitor {
     }
 
     visitDeclaration(node: Declaration) {
-        throw new Error("Method not implemented.");
+        //throw new Error("Method not implemented.");
     }
 
     visitFunc(node: Func) {
-        throw new Error("Method not implemented.");
+        //throw new Error("Method not implemented.");
     }
 
     visitSensor(node: Sensor) {
-        throw new Error("Method not implemented.");
+        //throw new Error("Method not implemented.");
     }
     visitSensorDistance(node: SensorDistance) {
-        throw new Error("Method not implemented.");
+        //throw new Error("Method not implemented.");
     }
     visitSensorTime(node: SensorTime) {
-        throw new Error("Method not implemented.");
+        //throw new Error("Method not implemented.");
     }
     visitVariable(node: Variable) {
-        throw new Error("Method not implemented.");
+        //throw new Error("Method not implemented.");
     }
     visitParameter(node: Parameter) {
-        throw new Error("Method not implemented.");
+        //throw new Error("Method not implemented.");
     }
     visitExpression(node: Expression) {
-        throw new Error("Method not implemented.");
+        //throw new Error("Method not implemented.");
     }
     visitArithmeticExpr(node: ArithmeticExpr) {
-        throw new Error("Method not implemented.");
+        //throw new Error("Method not implemented.");
     }
     visitBinaryArithmetic(node: BinaryArithmetic) {
-        throw new Error("Method not implemented.");
+        //throw new Error("Method not implemented.");
     }
     visitNegative(node: Negative) {
-        throw new Error("Method not implemented.");
+        //throw new Error("Method not implemented.");
     }
     visitBinaryBool(node: BinaryBool) {
         throw new Error("Method not implemented.");

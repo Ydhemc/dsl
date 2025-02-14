@@ -46,10 +46,24 @@ export class RobotMLAcceptWeaver {
         Speed: this.weaveSpeed,
         RobotProgram: this.weaveRobotProgram,
         Bool: this.weaveBool,
-        Real: this.weaveReal
+        Real: this.weaveReal,
+        Declaration: this.weaveDeclaration,
+        Instruction: this.weaveInstruction,
+        Variable: this.weaveVariable
     };
 
+    weaveDeclaration(node : InterfaceAST.Declaration, accept : ValidationAcceptor) : void {
+        (<any> node).accept = (visitor: RobotMLVisitor) => { return visitor.visitDeclaration(node as unknown as ClassAST.Declaration); }
+    }
     
+    weaveInstruction(node : InterfaceAST.Instruction, accept : ValidationAcceptor) : void {
+        (<any> node).accept = (visitor: RobotMLVisitor) => { return visitor.visitInstruction(node as unknown as ClassAST.Instruction); }
+    }
+
+    weaveVariable(node : InterfaceAST.Variable, accept : ValidationAcceptor) : void {
+        (<any> node).accept = (visitor: RobotMLVisitor) => { return visitor.visitVariable(node as unknown as ClassAST.Variable); }
+    }
+
     weaveFunc(node : InterfaceAST.Func, accept : ValidationAcceptor) : void {
         (<any> node).accept = (visitor: RobotMLVisitor) => { return visitor.visitFunc(node as unknown as ClassAST.Func); }
     }

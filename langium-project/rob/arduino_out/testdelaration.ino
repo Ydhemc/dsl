@@ -9,7 +9,8 @@
 
 Bool x;
 Bool v;
-Bool a; 
+Bool a;
+Real x; 
 void iLoveThisCode (Bool a, Bool v){
             
 }

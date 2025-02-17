@@ -2,7 +2,7 @@ var bool x;
 
 var bool v;
 var bool a;
-
+var real: km x;
 
 iLoveThisCode(bool a, bool v){
     var bool Dodo;

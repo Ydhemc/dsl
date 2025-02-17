@@ -258,7 +258,13 @@ ${node.$type} `)
 
     }
     visitReal(node: Real) {
-        this.setupNode.append(`${node.$type}`) 
+    //Sauvé dans un tableau le type ? cm mm m ?
+        if(this.para){
+            this.parametre+=node.$type+" "   
+        }else{        
+            this.declarationNode.append(`
+${node.$type} `)  
+        }
     }
     
 }

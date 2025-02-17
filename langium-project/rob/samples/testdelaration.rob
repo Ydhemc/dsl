@@ -1,2 +1,11 @@
 var bool x;
-Forward 2;
+
+var bool v;
+var bool a;
+
+
+iLoveThisCode(bool a, bool v){
+    var bool Dodo;
+    a = false;
+    iLoveThisCode(a, v+1);
+}

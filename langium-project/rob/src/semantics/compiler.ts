@@ -3,7 +3,7 @@ import { CompositeGeneratorNode, expandToNode, toString } from 'langium/generate
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { extractDestinationAndName } from '../cli/cli-util.js';
-import { isBackward, isForward, isLeft, isMovement, isRight, isRotate } from "../language/generated/ast.js";
+import { isBackward, isBool, isForward, isLeft, isMovement, isReal, isRight, isRotate} from "../language/generated/ast.js";
 
 export function generateArduino(model: RobotProgram, filePath: string, destination: string | undefined): string {
     const data = extractDestinationAndName(filePath, destination);
@@ -27,6 +27,8 @@ export class RobotVisitorImpl implements RobotMLVisitor {
     loopNode: CompositeGeneratorNode;
     currentType?: Type
 
+    parametre = "";
+    para = false;
 
     public constructor() {
         this.declarationNode = expandToNode``
@@ -46,6 +48,7 @@ export class RobotVisitorImpl implements RobotMLVisitor {
         #include <MotorWheel.h>
         #include <Omni4WD.h>
         `.append(this.declarationNode).append(expandToNode`
+
 
         irqISR(irq1, isr1);
         MotorWheel wheel1(3, 2, 4, 5, &irq1);
@@ -83,6 +86,7 @@ export class RobotVisitorImpl implements RobotMLVisitor {
         return fileNode
     }
 
+
     visitRobotProgram(node: RobotProgram) {
         this.visitDeclarations(node.declarations)
     }
@@ -100,7 +104,7 @@ export class RobotVisitorImpl implements RobotMLVisitor {
     }
 
     visitDeclaration(node: Declaration) {
-        //throw new Error("Method not implemented.");
+        //throw new Error("Declaration non pris en charge.")
     }
 
     visitInstruction(node: Instruction) {
@@ -110,7 +114,16 @@ export class RobotVisitorImpl implements RobotMLVisitor {
     }
 
     visitFunc(node: Func) {
-        //throw new Error("Method not implemented.");
+        this.parametre="";
+        this.para=true;
+        node.parameter.forEach((para, i) => {if(i>0){this.parametre+=", "}; para.accept(this)},)
+        this.declarationNode.append(` 
+${(node.typeReturn == undefined ? "void " : node.typeReturn.$type+" ") }${node.name} (${this.parametre}){
+            
+}
+`)
+        this.para=false;
+        this.parametre="";
     }
 
     visitSensor(node: Sensor) {
@@ -123,22 +136,32 @@ export class RobotVisitorImpl implements RobotMLVisitor {
         //throw new Error("Method not implemented.");
     }
     visitVariable(node: Variable) {
-        //throw new Error("Method not implemented.");
+        if(this.para){
+            node.type.accept(this);
+            this.parametre+=node.name    
+        }else {
+            node.type.accept(this);
+            this.declarationNode.append(`${node.name};`);
+        
+        }
+        
     }
     visitParameter(node: Parameter) {
-        //throw new Error("Method not implemented.");
+        console.log("para");
+        this.parametre+=node.name
+
     }
     visitExpression(node: Expression) {
-        //throw new Error("Method not implemented.");
+        throw new Error("Method not implemented.");
     }
     visitArithmeticExpr(node: ArithmeticExpr) {
-        //throw new Error("Method not implemented.");
+        throw new Error("Method not implemented.");
     }
     visitBinaryArithmetic(node: BinaryArithmetic) {
-        //throw new Error("Method not implemented.");
+        throw new Error("Method not implemented.");
     }
     visitNegative(node: Negative) {
-        //throw new Error("Method not implemented.");
+        throw new Error("Method not implemented.");
     }
     visitBinaryBool(node: BinaryBool) {
         throw new Error("Method not implemented.");
@@ -203,7 +226,6 @@ export class RobotVisitorImpl implements RobotMLVisitor {
         throw new Error("Method not implemented.");
     }
     visitForward(node: Forward) {
-
         node.parameter.accept(this)
     }
     visitLeft(node: Left) {
@@ -222,13 +244,22 @@ export class RobotVisitorImpl implements RobotMLVisitor {
         throw new Error("Method not implemented.");
     }
     visitType(node: Type) {
-        throw new Error("Method not implemented.");
+        if(isBool(node)) (node as Bool).accept(this);
+        if(isReal(node)) (node as Real).accept(this);
+        
     }
     visitBool(node: Bool) {
-        throw new Error("Method not implemented.");
+        if(this.para){
+            this.parametre+=node.$type+" "   
+        }else{        
+            this.declarationNode.append(`
+${node.$type} `)  
+        }
+
     }
     visitReal(node: Real) {
-        throw new Error("Method not implemented.");
+        this.setupNode.append(`${node.$type}`) 
     }
     
 }
+

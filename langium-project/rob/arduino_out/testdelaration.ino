@@ -7,6 +7,14 @@
 #include <MotorWheel.h>
 #include <Omni4WD.h>
 
+Bool x;
+Bool v;
+Bool a; 
+void iLoveThisCode (Bool a, Bool v){
+            
+}
+
+
 irqISR(irq1, isr1);
 MotorWheel wheel1(3, 2, 4, 5, &irq1);
 
@@ -21,6 +29,7 @@ MotorWheel wheel4(10, 7, 18, 19, &irq4);
 
 
 Omni4WD Omni(&wheel1, &wheel2, &wheel3, &wheel4);
+bool isDone = false;
 
 void setup() {
     TCCR1B = TCCR1B & 0xf8 | 0x01; // Pin9,Pin10 PWM 31250Hz
@@ -29,4 +38,9 @@ void setup() {
 }
 
 void loop() {
+    if(!isDone){
+        isDone = true;
+    } else {
+        Omni.setCarStop(0); // You should fix the lib because ms the parameter may be useless
+    }
 }

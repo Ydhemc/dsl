@@ -77,6 +77,9 @@ export class RobotVisitorImpl implements RobotMLVisitor {
         #include <PID_Beta6.h>
         #include <MotorWheel.h>
         #include <Omni4WD.h>
+
+        unsigned long __duration;
+        unsigned long __begin;
         `.append(this.declarationNode).append(expandToNode`
 
         irqISR(irq1, isr1);
@@ -144,12 +147,13 @@ export class RobotVisitorImpl implements RobotMLVisitor {
     visitFunc(node: Func) {
         this.parametre="";
         this.para=true;
-        node.parameter.forEach((para, i) => {if(i>0){this.parametre+=", "}; para.accept(this)},)
+        node.parameter.forEach((para, i) => {if(i>0){this.parametre+=", "}; this.parametre+=(para.type.$type=="Bool" ? "bool ":"int ")+para.name/*para.accept(this)*/},)
         this.declarationNode.append(` 
-        ${(node.typeReturn == undefined ? "void " : node.typeReturn.$type+" ") }${node.name} (${this.parametre}){
-            
-        }
-        `)
+${(node.typeReturn == undefined ? "void " : node.typeReturn.$type+" ") }${node.name} (${this.parametre}){
+        //instruction    
+}
+        
+`)
         this.para=false;
         this.parametre="";
     }
@@ -242,8 +246,8 @@ export class RobotVisitorImpl implements RobotMLVisitor {
         distanceExpr.accept(this)
         this.requireRealAnyDistUnit("linear movement")
         this.loopNode.append(`
-            unsigned long __duration = 1000*( Omni.getSpeedMMPS() * ${this.currentExprStr});
-            unsigned long __begin = millis();
+            __duration = 1000*( Omni.getSpeedMMPS() * ${this.currentExprStr});
+            __begin = millis();
             while((millis() - __begin) < __duration){${action};}`).appendNewLine()
     }
 
@@ -269,8 +273,8 @@ export class RobotVisitorImpl implements RobotMLVisitor {
         }else {
             this.loopNode.append(`
             int __rota = ${this.currentExprStr};
-            unsigned long __duration = 1000*( Omni.getSpeedMMPS() * __rota);
-            unsigned long __begin = millis();
+            __duration = 1000*( Omni.getSpeedMMPS() * __rota);
+            __begin = millis();
             while((millis() - __begin) < __duration){
                 if(__rota < 0) Omni.setCarRotateLeft(Omni.getSpeedMMPS());
                 else Omni.setCarRotateRight(Omni.getSpeedMMPS());
@@ -293,20 +297,20 @@ export class RobotVisitorImpl implements RobotMLVisitor {
     }
     visitBool(node: Bool) {
         if(this.para){
-            this.parametre+=node.$type+" "   
+            this.parametre+=("bool ")   
         }else{        
             this.declarationNode.append(`
-${node.$type} `)  
+bool `)  
         }
 
     }
     visitReal(node: Real) {
     //Sauvé dans un tableau le type ? cm mm m ?
         if(this.para){
-            this.parametre+=node.$type+" "   
+            this.parametre+="int "   
         }else{        
             this.declarationNode.append(`
-${node.$type} `)  
+int `)  
         }
     }
     

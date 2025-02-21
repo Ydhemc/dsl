@@ -27,7 +27,6 @@ export class RobotVisitorImpl implements RobotMLVisitor {
     loopNode: CompositeGeneratorNode;
     currentType?: Type
     currentExprStr: string
-
     parametre = "";
     para = false;
 
@@ -122,13 +121,13 @@ export class RobotVisitorImpl implements RobotMLVisitor {
         this.visitInstructions(node.instructions)
     }
 
-    visitDeclarations(declarations: Declaration[]){
+    private visitDeclarations(declarations: Declaration[]){
         declarations.forEach(element => {
             element.accept(this)
         });
     }
 
-    visitInstructions(instructions: Instruction[]){
+    private visitInstructions(instructions: Instruction[]){
         instructions.forEach(element => {
             element.accept(this)
         })
@@ -217,7 +216,7 @@ export class RobotVisitorImpl implements RobotMLVisitor {
         throw new Error("Method not implemented.");
     }
     visitVarExpr(node: VarExpr) {
-        throw new Error("Method not implemented.");
+        //throw new Error("Method not implemented.");
     }
     visitAssignment(node: Assignment) {
         throw new Error("Method not implemented.");
@@ -234,6 +233,7 @@ export class RobotVisitorImpl implements RobotMLVisitor {
     visitLoop(node: Loop) {
         throw new Error("Method not implemented.");
     }
+
     visitMovement(node: Movement) {
         throw new Error("Method not implemented.");
     }

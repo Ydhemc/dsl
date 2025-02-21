@@ -1,6 +1,10 @@
 var bool x;
+var real: mm y;
 
-x = true;
-
-Forward x;
+Forward y;
+Backward y;
+Rotate y;
+Speed y;
+Left y;
+Right y;
 

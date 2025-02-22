@@ -3,7 +3,7 @@ import { CompositeGeneratorNode, expandToNode, toString } from 'langium/generate
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { extractDestinationAndName } from '../cli/cli-util.js';
-import { isBool, isReal, Unit} from "../language/generated/ast.js";
+import {Unit} from "../language/generated/ast.js";
 
 export function generateArduino(model: RobotProgram, filePath: string, destination: string | undefined): string {
     const data = extractDestinationAndName(filePath, destination);
@@ -26,7 +26,7 @@ export class RobotVisitorImpl implements RobotMLVisitor {
     loopNode: CompositeGeneratorNode;
     currentType?: Type
     currentExprStr: string
-
+    currentReturnType?: Type
     currentBlock: CompositeGeneratorNode;
 
     parametre = "";
@@ -38,7 +38,7 @@ export class RobotVisitorImpl implements RobotMLVisitor {
         this.loopNode = expandToNode``
         this.currentType = undefined
         this.currentExprStr = ""
-
+        this.currentReturnType = undefined
         this.currentBlock=this.loopNode;
     } 
 
@@ -78,6 +78,12 @@ export class RobotVisitorImpl implements RobotMLVisitor {
     private requireRealAnyUnit(message: string): Unit{
         this.requireType('Real', message)
         return (this.currentType as Real).unit
+    }
+
+    private getCType(robType: Type | undefined): string {
+        if(robType == undefined) return "void"
+        else if(robType.$type == 'Bool') return "bool"
+        else return "int"
     }
 
     public getFileNode(): CompositeGeneratorNode {
@@ -158,47 +164,36 @@ export class RobotVisitorImpl implements RobotMLVisitor {
     }
 
     visitFunc(node: Func) {
-        this.currentBlock=expandToNode``
-
+        this.currentReturnType=node.typeReturn
+        this.currentBlock=expandToNode`` //change current block node for instructions
         this.parametre="";
         this.para=true;
-        node.parameter.forEach((para, i) => {if(i>0){this.parametre+=", "}; this.parametre+=(para.type.$type=="Bool" ? "bool ":"int ")+para.name/*para.accept(this)*/},)
-        this.declarationNode.append(` 
-${(node.typeReturn == undefined ? "void " : node.typeReturn.$type+" ") }${node.name} (${this.parametre}){
-        //instruction    
-`)
+        node.parameter.forEach((para, i) => {if(i>0){this.parametre+=", "}; this.parametre+=this.getCType(para.type)+" "+para.name},)
+        this.declarationNode.append(`${this.getCType(node.typeReturn)} ${node.name}(${this.parametre}){`)
         node.instruction.accept(this); //block
         this.declarationNode.append(this.currentBlock)
-        this.declarationNode.append(` 
-}`)
-
-
+        this.declarationNode.append(`
+}`).appendNewLine()
         this.para=false;
         this.parametre="";
-
         this.currentBlock=this.loopNode;
+        this.currentReturnType=undefined
     }
 
     visitSensor(node: Sensor) {
-        //throw new Error("Method not implemented.");
+        throw new Error("Method not implemented.");
     }
     visitSensorDistance(node: SensorDistance) {
-        //throw new Error("Method not implemented.");
+        throw new Error("Method not implemented.");
     }
     visitSensorTime(node: SensorTime) {
-        //throw new Error("Method not implemented.");
+        throw new Error("Method not implemented.");
     }
     visitVariable(node: Variable) {
-        if(this.para){
-            node.type.accept(this);
-            this.parametre+=node.name    
-        }else {
-            node.type.accept(this);
-            this.declarationNode.append(`${node.name};`);
-        
-        }
-        
+        this.currentBlock.append(`
+        ${this.getCType(node.type)} ${node.name};`).appendNewLine()
     }
+
     visitExpression(node: Expression) {
         throw new Error("Should not be visited");
     }
@@ -307,7 +302,6 @@ ${(node.typeReturn == undefined ? "void " : node.typeReturn.$type+" ") }${node.n
         this.currentType = undefined
     }
     visitBlock(node: Block) {
-        //throw new Error("Method not Block.");
         node.declarations.forEach(e => e.accept(this));
         node.instructions.forEach(i => i.accept(this));
     }
@@ -332,39 +326,32 @@ ${(node.typeReturn == undefined ? "void " : node.typeReturn.$type+" ") }${node.n
             this.currentType = undefined
         } else { throw new Error("undefined function") }
     }
+
     visitCondition(node: Condition) {
         node.booleanexpr.accept(this);
-
+        this.requireBool("If Conditition expression")
         this.currentBlock.append(`
-    if( ${this.currentExprStr} ){
-        /* instruction if*/ 
-    `)
+        if( ${this.currentExprStr} ){`)
         node.ifInstr.accept(this);
-        
         if(node.elseInstr!=undefined) {
             this.currentBlock.append(`
-    }else { 
-    /*Instruction Else*/` )
-            node.elseInstr.accept(this);
+        }else {`)
+        node.elseInstr.accept(this);
         }
-        
         this.currentBlock.append(`
-    } `)
+        }`).appendNewLine()
+        this.currentType = undefined
     }
-
-
 
     visitLoop(node: Loop) {
         node.booleanexpr.accept(this)
         this.requireBool("Loop condition")
         this.currentBlock.append(`
-    while(${this.currentExprStr}){`).appendNewLine()
-
+        while(${this.currentExprStr}){`)
         node.instruction.accept(this);
-
         this.currentBlock.append(`
-    }`).appendNewLine()
-    
+        }`).appendNewLine()
+        this.currentType = undefined
     }
 
     visitMovement(node: Movement) {
@@ -375,9 +362,9 @@ ${(node.typeReturn == undefined ? "void " : node.typeReturn.$type+" ") }${node.n
         distanceExpr.accept(this)
         this.requireRealAnyDistUnit("linear movement")
         this.currentBlock.append(`
-            __duration = 1000*( Omni.getSpeedMMPS() * ${this.currentExprStr});
-            __begin = millis();
-            while((millis() - __begin) < __duration){${action};}`).appendNewLine()
+        __duration = 1000*( Omni.getSpeedMMPS() * ${this.currentExprStr});
+        __begin = millis();
+        while((millis() - __begin) < __duration){${action};}`).appendNewLine()
     }
 
     visitBackward(node: Backward) {
@@ -405,51 +392,43 @@ ${(node.typeReturn == undefined ? "void " : node.typeReturn.$type+" ") }${node.n
             throw new Error("Rotation with radians not implemented yet")
         }else {
             this.currentBlock.append(`
-            int __rota = ${this.currentExprStr};
-            __duration = 1000*( Omni.getSpeedMMPS() * __rota);
-            __begin = millis();
-            while((millis() - __begin) < __duration){
-                if(__rota < 0) Omni.setCarRotateLeft(Omni.getSpeedMMPS());
-                else Omni.setCarRotateRight(Omni.getSpeedMMPS());
-            }`).appendNewLine()
+        int __rota = ${this.currentExprStr};
+        __duration = 1000*( Omni.getSpeedMMPS() * __rota);
+        __begin = millis();
+        while((millis() - __begin) < __duration){
+            if(__rota < 0) Omni.setCarRotateLeft(Omni.getSpeedMMPS());
+            else Omni.setCarRotateRight(Omni.getSpeedMMPS());
+        }`).appendNewLine()
         }
         this.currentType = undefined
     }
     visitReturn(node: Return) {
-        node.expression.accept(this)
-        this.currentBlock.append(`
-            return ${this.currentExprStr}
-        `)
+        if(node.expression){
+            node.expression.accept(this)
+            this.requireExactType(this.currentReturnType, "Return statement")
+            this.currentBlock.append(`
+        return ${this.currentExprStr};`).appendNewLine()
+        } else {
+            this.currentBlock.append(`
+        return;`).appendNewLine()
+        }
+        this.currentType = undefined
     }
     visitSpeed(node: Speed) {
         node.parameter.accept(this) // expression
         this.requireRealAnyUnit("speed")
         this.currentBlock.append(`
-            Omni.setCarSpeedMMPS(${this.currentExprStr});`).appendNewLine()
+        Omni.setCarSpeedMMPS(${this.currentExprStr});`).appendNewLine()
         this.currentType = undefined
     }
     visitType(node: Type) {
-        if(isBool(node)) (node as Bool).accept(this);
-        if(isReal(node)) (node as Real).accept(this);
-        
+        //Not Visited
     }
     visitBool(node: Bool) {
-        if(this.para){
-            this.parametre+=("bool ")   
-        }else{        
-            this.declarationNode.append(`
-bool `)  
-        }
-
+        //Not visited
     }
     visitReal(node: Real) {
-    //Sauvé dans un tableau le type ? cm mm m ?
-        if(this.para){
-            this.parametre+="int "   
-        }else{        
-            this.declarationNode.append(`
-int `)  
-        }
+        //Not visited
     }
     
 }

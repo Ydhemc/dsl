@@ -4,6 +4,30 @@ var real: mm y;
 real: mm hello(real: mm a, real: mm b, bool c){
     if(c) return a + b;
     return 2;
+    loop (true || false){
+        var bool z;
+        if (true || c) {
+            if (true || false) return 2;
+            Forward 2;
+        }
+    }
+}
+
+nice(){
+    var bool j;
+    if(j) return;
+    return;
+    loop (true || false){
+        var bool z;
+        if (true || j) {
+            loop(true || false){
+                if (true || false) {
+                return;
+                }
+                Forward 2;
+            }
+        }
+    }
 }
 
 Forward 2 +2 +2 + 2;
@@ -15,7 +39,9 @@ Rotate y + 9/2;
 Speed y;
 Left -2 * 2 + 2 * 2 * (2 * 2);
 Right hello(2, 2, true) + 2;
-
-hello(2, 2, true);
-hello(2, 2, false);
+if(true || x){
+    var real: mm t;
+    hello(2, 2, true);
+    hello(2, 2, false);
+}
 

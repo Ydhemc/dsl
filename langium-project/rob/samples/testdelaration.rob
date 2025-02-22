@@ -5,7 +5,15 @@ var bool a;
 var real: km x;
 
 iLoveThisCode(bool a, bool v){
-    var bool Dodo;
-    a = false;
-    iLoveThisCode(a, v+1);
+    Forward 2 +2 +2 + 2;
+}
+
+if(true){
+    Forward 2;
+}else {
+    Forward 4;
+}
+
+loop(false){
+    Forward 10;
 }

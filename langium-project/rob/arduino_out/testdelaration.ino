@@ -16,8 +16,8 @@ bool a;
 int x; 
 void iLoveThisCode (bool a, bool v){
         //instruction    
+ 
 }
-        
 irqISR(irq1, isr1);
 MotorWheel wheel1(3, 2, 4, 5, &irq1);
 
@@ -42,7 +42,33 @@ void setup() {
 
 void loop() {
     if(!__isDone){
-        __isDone = true;
+    
+            __duration = 1000*( Omni.getSpeedMMPS() * (((2+2)+2)+2));
+            __begin = millis();
+            while((millis() - __begin) < __duration){Omni.setCarAdvance(Omni.getCarSpeedMMPS());}
+
+    if( true ){
+        /* instruction if*/ 
+    
+            __duration = 1000*( Omni.getSpeedMMPS() * 2);
+            __begin = millis();
+            while((millis() - __begin) < __duration){Omni.setCarAdvance(Omni.getCarSpeedMMPS());}
+
+    }else { 
+    /*Instruction Else*/
+            __duration = 1000*( Omni.getSpeedMMPS() * 4);
+            __begin = millis();
+            while((millis() - __begin) < __duration){Omni.setCarAdvance(Omni.getCarSpeedMMPS());}
+
+    } 
+    while(false){
+
+            __duration = 1000*( Omni.getSpeedMMPS() * 10);
+            __begin = millis();
+            while((millis() - __begin) < __duration){Omni.setCarAdvance(Omni.getCarSpeedMMPS());}
+
+    }
+    __isDone = true;
     } else {
         Omni.setCarSlow2Stop(1000)
     }

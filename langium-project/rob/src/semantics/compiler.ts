@@ -159,9 +159,12 @@ export class RobotVisitorImpl implements RobotMLVisitor {
         this.declarationNode.append(` 
 ${(node.typeReturn == undefined ? "void " : node.typeReturn.$type+" ") }${node.name} (${this.parametre}){
         //instruction    
-}
-        
 `)
+        node.instruction.accept(this); //block
+        this.declarationNode.append(` 
+}`)
+
+
         this.para=false;
         this.parametre="";
     }
@@ -271,7 +274,7 @@ ${(node.typeReturn == undefined ? "void " : node.typeReturn.$type+" ") }${node.n
         this.currentExprStr = ""+node.value
     }
     visitSensorExpr(node: SensorExpr) {
-        throw new Error("Method not implemented.");
+        throw new Error("Method not implemented. Sensor");
     }
     visitVarExpr(node: VarExpr) {
         let varRef: Variable | undefined = node.variableRef.ref;
@@ -294,7 +297,9 @@ ${(node.typeReturn == undefined ? "void " : node.typeReturn.$type+" ") }${node.n
         this.currentType = undefined
     }
     visitBlock(node: Block) {
-        throw new Error("Method not implemented.");
+        //throw new Error("Method not Block.");
+        node.declarations.forEach(e => e.accept(this));
+        node.instructions.forEach(i => i.accept(this));
     }
     visitCall(node: Call) {
         let func = node.fonction.ref
@@ -318,14 +323,42 @@ ${(node.typeReturn == undefined ? "void " : node.typeReturn.$type+" ") }${node.n
         } else { throw new Error("undefined function") }
     }
     visitCondition(node: Condition) {
-        throw new Error("Method not implemented.");
+        node.booleanexpr.accept(this);
+
+        this.loopNode.append(`
+    if( ${this.currentExprStr} ){
+        /* instruction if*/ 
+    `)
+        node.ifInstr.accept(this);
+        
+        if(node.elseInstr!=undefined) {
+            this.loopNode.append(`
+    }else { 
+    /*Instruction Else*/` )
+            node.elseInstr.accept(this);
+        }
+        
+        this.loopNode.append(`
+    } `)
     }
+
+
+
     visitLoop(node: Loop) {
-        throw new Error("Method not implemented.");
+        node.booleanexpr.accept(this)
+        this.requireBool("Loop condition")
+        this.loopNode.append(`
+    while(${this.currentExprStr}){`).appendNewLine()
+
+        node.instruction.accept(this);
+
+        this.loopNode.append(`
+    }`).appendNewLine()
+    
     }
 
     visitMovement(node: Movement) {
-        throw new Error("Method not implemented.");
+        throw new Error("Method not implemented. mov");
     }
 
     private surroundWithDistanceLoop(distanceExpr: Expression, action: string){
@@ -373,7 +406,7 @@ ${(node.typeReturn == undefined ? "void " : node.typeReturn.$type+" ") }${node.n
         this.currentType = undefined
     }
     visitReturn(node: Return) {
-        throw new Error("Method not implemented.");
+        throw new Error("Method not implemented. return");
     }
     visitSpeed(node: Speed) {
         node.parameter.accept(this) // expression

@@ -21,7 +21,7 @@ export class RobotMLAcceptWeaver {
         Func: this.weaveFunc,
         SensorDistance: this.weaveSensorDistance,
         SensorTime: this.weaveSensorTime,
-        Parameter: this.weaveParameter,
+        Variable: this.weaveVariable,
         BinaryArithmetic: this.weaveBinaryArithmetic,
         Negative: this.weaveNegative,
         BinaryBool: this.weaveBinaryBool,
@@ -46,15 +46,10 @@ export class RobotMLAcceptWeaver {
         Speed: this.weaveSpeed,
         RobotProgram: this.weaveRobotProgram,
         Bool: this.weaveBool,
-        Real: this.weaveReal,
-        Variable: this.weaveVariable
+        Real: this.weaveReal
     };
 
     
-    weaveVariable(node : InterfaceAST.Variable, accept : ValidationAcceptor) : void {
-        (<any> node).accept = (visitor: RobotMLVisitor) => { return visitor.visitVariable(node as unknown as ClassAST.Variable); }
-    }
-
     weaveFunc(node : InterfaceAST.Func, accept : ValidationAcceptor) : void {
         (<any> node).accept = (visitor: RobotMLVisitor) => { return visitor.visitFunc(node as unknown as ClassAST.Func); }
     }
@@ -67,8 +62,8 @@ export class RobotMLAcceptWeaver {
         (<any> node).accept = (visitor: RobotMLVisitor) => { return visitor.visitSensorTime(node as unknown as ClassAST.SensorTime); }
     }
     
-    weaveParameter(node : InterfaceAST.Parameter, accept : ValidationAcceptor) : void {
-        (<any> node).accept = (visitor: RobotMLVisitor) => { return visitor.visitParameter(node as unknown as ClassAST.Parameter); }
+    weaveVariable(node : InterfaceAST.Variable, accept : ValidationAcceptor) : void {
+        (<any> node).accept = (visitor: RobotMLVisitor) => { return visitor.visitVariable(node as unknown as ClassAST.Variable); }
     }
     
     weaveBinaryArithmetic(node : InterfaceAST.BinaryArithmetic, accept : ValidationAcceptor) : void {

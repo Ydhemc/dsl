@@ -55,13 +55,10 @@ interface Sensor extends Declaration {
 }
 
 interface Func extends Declaration {
-	parameter: Parameter[]
+	parameter: Variable[]
 	name: string
 	typeReturn?: Type
 	instruction: Instruction
-}
-
-interface Parameter extends Variable{
 }
 
 interface SensorDistance extends Sensor {

@@ -75,8 +75,8 @@ SensorTime returns SensorTime:
     {SensorTime} 'SensorTime' name=EString   
 ;
 
-Parameter returns Parameter:
-    {Parameter} ^type=Type name=EString
+Parameter returns Variable:
+    {Variable} ^type=Type name=EString
 ;
 
 EString returns string:

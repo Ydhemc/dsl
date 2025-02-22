@@ -9,7 +9,6 @@ export interface RobotMLVisitor {
     visitSensorDistance(node : SensorDistance) : any;
     visitSensorTime(node : SensorTime) : any;
     visitVariable(node : Variable) : any;
-    visitParameter(node : Parameter) : any;
     visitExpression(node : Expression) : any;
     visitArithmeticExpr(node : ArithmeticExpr) : any;
     visitBinaryArithmetic(node : BinaryArithmetic) : any;
@@ -46,7 +45,7 @@ export interface RobotMLVisitor {
 
 export class Declaration implements ASTInterfaces.Declaration {
     
-    constructor(public $type: 'Declaration' | 'Func' | 'Sensor' | 'SensorDistance' | 'SensorTime' | 'Variable' | 'Parameter') {
+    constructor(public $type: 'Declaration' | 'Func' | 'Sensor' | 'SensorDistance' | 'SensorTime' | 'Variable') {
     }
     
      accept(visitor: RobotMLVisitor) : any {
@@ -55,7 +54,7 @@ export class Declaration implements ASTInterfaces.Declaration {
 
 export class Func extends Declaration implements ASTInterfaces.Func {
     
-    constructor(public override $type: 'Func', public parameter: Parameter[], public name: string, public typeReturn: Type, public instruction: Instruction) {
+    constructor(public override $type: 'Func', public parameter: Variable[], public name: string, public typeReturn: Type, public instruction: Instruction) {
         super($type);
     }
     
@@ -98,22 +97,12 @@ export class SensorTime extends Sensor implements ASTInterfaces.SensorTime {
 
 export class Variable extends Declaration implements ASTInterfaces.Variable {
     
-    constructor(public override $type: 'Variable' | 'Parameter', public $container: Func, public type: Type, public name: string) {
+    constructor(public override $type: 'Variable', public $container: Func, public type: Type, public name: string) {
         super($type);
     }
     
     override accept(visitor: RobotMLVisitor) : any {
-    }
-}
-
-export class Parameter extends Variable implements ASTInterfaces.Parameter {
-    
-    constructor(public override $type: 'Parameter', public override $container: Func, public override type: Type, public override name: string) {
-        super($type, $container, type, name);
-    }
-    
-    override accept(visitor: RobotMLVisitor) : any {
-        return visitor.visitParameter(this);
+        return visitor.visitVariable(this);
     }
 }
 

@@ -1,10 +1,10 @@
 var bool x;
 var real: mm y;
 
-Forward y;
-Backward y;
-Rotate y;
+Forward 2 +2 +2 + 2;
+Backward 200;
+Rotate y + 9/2;
 Speed y;
-Left y;
+Left -2 * 2 + 2 * 2 * (2 * 2);
 Right y;
 

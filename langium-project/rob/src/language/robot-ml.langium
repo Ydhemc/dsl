@@ -22,15 +22,13 @@ Expression returns Expression:
 ;
 
 BooleanExpr returns BooleanExpr:
-    {BinaryBool}  expressionL=FactorBool operation=BoolOperation_AND expressionR=BooleanExpr
-    | {BinaryBool}  expressionL=FactorBool operation=BoolOperation_OR expressionR=BooleanExpr
+    FactorBool ({BinaryBool.expressionL=current} operation=(BoolOperation_AND | BoolOperation_OR) expressionR=FactorBool)*
     | {BinaryBool}  expressionL=ArithmeticExpr operation=BoolOperation_INF expressionR=ArithmeticExpr
     | {BinaryBool}  expressionL=ArithmeticExpr operation=BoolOperation_INF_EQ expressionR=ArithmeticExpr
     | {BinaryBool}  expressionL=ArithmeticExpr operation=BoolOperation_SUP expressionR=ArithmeticExpr
     | {BinaryBool}  expressionL=ArithmeticExpr operation=BoolOperation_SUP_EQ expressionR=ArithmeticExpr
     | {BinaryBool}  expressionL=ArithmeticExpr operation=BoolOperation_EQ expressionR=ArithmeticExpr
     | {BinaryBool}  expressionL=ArithmeticExpr operation=BoolOperation_NEQ expressionR=ArithmeticExpr
-    | FactorBool
 ;
 
 FactorBool returns BooleanExpr:
@@ -42,15 +40,11 @@ PrimaryBool returns BooleanExpr:
 ;
 
 ArithmeticExpr returns Expression:
-    {BinaryArithmetic}  expressionL=FactorAri operation=ArithmeticOperation_ADD expressionR=FactorAri
-    | {BinaryArithmetic}  expressionL=FactorAri operation=ArithmeticOperation_SUB expressionR=FactorAri
-    | FactorAri
+    FactorAri ({BinaryArithmetic.expressionL=current} operation=(ArithmeticOperation_ADD | ArithmeticOperation_SUB) expressionR=FactorAri)*
 ;
 
 FactorAri returns Expression:
-    {BinaryArithmetic}  expressionL=PrimaryAri operation=ArithmeticOperation_MULT expressionR=PrimaryAri
-    | {BinaryArithmetic}  expressionL=PrimaryAri operation=ArithmeticOperation_DIV expressionR=PrimaryAri
-    | PrimaryAri
+    PrimaryAri ({BinaryArithmetic.expressionL=current} operation=(ArithmeticOperation_MULT | ArithmeticOperation_DIV) expressionR=PrimaryAri)*
 ;
 
 PrimaryAri returns Expression:
@@ -183,7 +177,7 @@ VarExpr returns VarExpr:
 ;
 
 Negative returns Negative:
-    {Negative} '-' expression=ArithmeticExpr   
+    {Negative} '-' expression=PrimaryAri   
 ;
 
 SensorExpr returns SensorExpr:

@@ -19,7 +19,6 @@ export function generateArduino(model: RobotProgram, filePath: string, destinati
     return generatedFilePath;
 }
 
-
 export class RobotVisitorImpl implements RobotMLVisitor {
 
     declarationNode: CompositeGeneratorNode;
@@ -34,7 +33,7 @@ export class RobotVisitorImpl implements RobotMLVisitor {
         this.declarationNode = expandToNode``
         this.setupNode = expandToNode``
         this.loopNode = expandToNode``
-        this.currentType = new Real('Real', 'mm') //undefined
+        this.currentType = undefined
         this.currentExprStr = ""
     } 
 
@@ -44,15 +43,16 @@ export class RobotVisitorImpl implements RobotMLVisitor {
         }
     }
 
-    /*private requireBool(message: string){
+    private requireBool(message: string){
         this.requireType('Bool', message)
     }
+    
 
     private requireRealOfUnit(unit: Unit, message: string){
         if(this.currentType?.$type != 'Real' || (this.currentType as Real).unit != unit){
             throw new Error("The type should be [Real in "+unit+"] for : "+message)
         }
-    }*/
+    }
 
     private requireRealAnyDistUnit(message: string): Unit{
         console.log("type is "+this.currentType)
@@ -184,43 +184,81 @@ ${(node.typeReturn == undefined ? "void " : node.typeReturn.$type+" ") }${node.n
 
     }
     visitExpression(node: Expression) {
-        throw new Error("Method not implemented.");
+        throw new Error("Should not be visited");
     }
     visitArithmeticExpr(node: ArithmeticExpr) {
-        throw new Error("Method not implemented.");
+        throw new Error("Should not be visited");
     }
     visitBinaryArithmetic(node: BinaryArithmetic) {
-        throw new Error("Method not implemented.");
+        let op = node.operation
+        node.expressionL.accept(this)
+        let unit = this.requireRealAnyUnit("Arithmetic expression")
+        let left = this.currentExprStr
+        node.expressionR.accept(this)
+        this.requireRealOfUnit(unit, "Arithmetic expression") // should have same unit as left branch
+        let right = this.currentExprStr
+        this.currentExprStr = "(" + left + op + right + ")"
     }
     visitNegative(node: Negative) {
-        throw new Error("Method not implemented.");
+        node.expression.accept(this)
+        this.requireRealAnyUnit("Negative number expression")
+        this.currentExprStr = "(-"+this.currentExprStr+")"
+        //this.currentType = this.currentType
     }
     visitBinaryBool(node: BinaryBool) {
-        throw new Error("Method not implemented.");
+        let op = node.operation
+        if(op == '&&' || op == '||'){
+            node.expressionL.accept(this)
+            this.requireBool("Boolean operator Expression")
+            let left = this.currentExprStr
+            node.expressionR.accept(this)
+            this.requireBool("Boolean operator Expression")
+            let right = this.currentExprStr
+            this.currentExprStr = "(" + left + op + right + ")"
+        } else { //>= <= ...
+            node.expressionL.accept(this)
+            let unit = this.requireRealAnyUnit("Comparison Expression")
+            let left = this.currentExprStr
+            node.expressionR.accept(this)
+            this.requireRealOfUnit(unit, "Comparison expression") // should have same unit as left branch
+            let right = this.currentExprStr
+            this.currentExprStr = "(" + left + op + right + ")"
+        }
+        this.currentType = new Bool('Bool')
     }
     visitBooleanExpr(node: BooleanExpr) {
-        throw new Error("Method not implemented.");
+        throw new Error("Should not be visited");
     }
     visitNot(node: Not) {
-        throw new Error("Method not implemented.");
+        node.expression.accept(this)
+        this.requireBool("Not expression")
+        this.currentExprStr = "!("+this.currentExprStr+")"
+        this.currentType = new Bool('Bool')
     }
     visitFalseExpr(node: FalseExpr) {
-        throw new Error("Method not implemented.");
+        this.currentType = new Bool('Bool')
+        this.currentExprStr = 'false'
     }
     visitTrueExpr(node: TrueExpr) {
-        throw new Error("Method not implemented.");
+        this.currentType = new Bool('Bool')
+        this.currentExprStr = 'true'
     }
     visitCallExpr(node: CallExpr) {
         throw new Error("Method not implemented.");
     }
     visitNumeralExpr(node: NumeralExpr) {
-        throw new Error("Method not implemented.");
+        this.currentType = new Real('Real', 'mm')
+        this.currentExprStr = ""+node.value
     }
     visitSensorExpr(node: SensorExpr) {
         throw new Error("Method not implemented.");
     }
     visitVarExpr(node: VarExpr) {
-        //throw new Error("Method not implemented.");
+        let varRef: Variable | undefined = node.variableRef.ref;
+        if (varRef) {
+            this.currentType = varRef.type;
+            this.currentExprStr = varRef.name;
+        } else throw Error("Variable declaration not found")
     }
     visitAssignment(node: Assignment) {
         throw new Error("Method not implemented.");

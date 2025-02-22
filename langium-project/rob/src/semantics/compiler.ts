@@ -281,7 +281,17 @@ ${(node.typeReturn == undefined ? "void " : node.typeReturn.$type+" ") }${node.n
         } else throw Error("Variable declaration not found")
     }
     visitAssignment(node: Assignment) {
-        throw new Error("Method not implemented.");
+        let variableRef = node.variable.ref
+        if(variableRef){
+            node.expression.accept(this)
+            this.requireExactType(variableRef.type, "Assignment to "+variableRef.name)
+            this.loopNode.append(`
+            ${variableRef.name} = ${this.currentExprStr};`).appendNewLine()
+        }
+        else {
+            throw new Error("Variable declaration not found")
+        }
+        this.currentType = undefined
     }
     visitBlock(node: Block) {
         throw new Error("Method not implemented.");
@@ -311,17 +321,21 @@ ${(node.typeReturn == undefined ? "void " : node.typeReturn.$type+" ") }${node.n
 
     visitBackward(node: Backward) {
         this.surroundWithDistanceLoop(node.parameter, "Omni.setCarBackoff(Omni.getCarSpeedMMPS())")
+        this.currentType = undefined
     }
 
     visitForward(node: Forward) {
         this.surroundWithDistanceLoop(node.parameter, "Omni.setCarAdvance(Omni.getCarSpeedMMPS())")
+        this.currentType = undefined
     }
 
     visitLeft(node: Left) {
         this.surroundWithDistanceLoop(node.parameter, "Omni.setCarLeft(Omni.getCarSpeedMMPS())")
+        this.currentType = undefined
     }
     visitRight(node: Right) {
         this.surroundWithDistanceLoop(node.parameter, "Omni.setCarRight(Omni.getCarSpeedMMPS())")
+        this.currentType = undefined
     }
     visitRotate(node: Rotate) { //OMEGA = dteta/dt rad/s avec dteta rapport d'angle parcouru et dt rapport de temps
         node.parameter.accept(this)
@@ -338,6 +352,7 @@ ${(node.typeReturn == undefined ? "void " : node.typeReturn.$type+" ") }${node.n
                 else Omni.setCarRotateRight(Omni.getSpeedMMPS());
             }`).appendNewLine()
         }
+        this.currentType = undefined
     }
     visitReturn(node: Return) {
         throw new Error("Method not implemented.");
@@ -347,6 +362,7 @@ ${(node.typeReturn == undefined ? "void " : node.typeReturn.$type+" ") }${node.n
         this.requireRealAnyUnit("speed")
         this.loopNode.append(`
             Omni.setCarSpeedMMPS(${this.currentExprStr});`).appendNewLine()
+        this.currentType = undefined
     }
     visitType(node: Type) {
         if(isBool(node)) (node as Bool).accept(this);

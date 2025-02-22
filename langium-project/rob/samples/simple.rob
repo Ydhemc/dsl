@@ -8,6 +8,9 @@ real: mm hello(real: mm a, real: mm b, bool c){
 
 Forward 2 +2 +2 + 2;
 Backward 200;
+y = hello(2, 2, false) * 6 + 2 * 3; 
+x = true;
+x = !(x || true) && false;
 Rotate y + 9/2;
 Speed y;
 Left -2 * 2 + 2 * 2 * (2 * 2);

@@ -297,7 +297,25 @@ ${(node.typeReturn == undefined ? "void " : node.typeReturn.$type+" ") }${node.n
         throw new Error("Method not implemented.");
     }
     visitCall(node: Call) {
-        throw new Error("Method not implemented.");
+        let func = node.fonction.ref
+        if(func){
+            if(func.parameter.length != node.parameters.length) {
+                throw new Error("Not right number of parameters for function call: "+func.name)
+            }
+            let params = node.parameters
+            let paramsStr = ""
+            for (let i = 0; i < params.length; i++) {
+                params[i].accept(this)
+                this.requireExactType(func.parameter[i].type, "Parameter "+func.parameter[i].name+" in "+func.name+" call")
+                paramsStr += this.currentExprStr
+                if(i != (params.length-1)) {
+                    paramsStr += ", "
+                } 
+            }
+            this.loopNode.append(`
+            ${func.name}(${paramsStr});`).appendNewLine()
+            this.currentType = undefined
+        } else { throw new Error("undefined function") }
     }
     visitCondition(node: Condition) {
         throw new Error("Method not implemented.");

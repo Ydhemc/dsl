@@ -16,3 +16,6 @@ Speed y;
 Left -2 * 2 + 2 * 2 * (2 * 2);
 Right hello(2, 2, true) + 2;
 
+hello(2, 2, true);
+hello(2, 2, false);
+

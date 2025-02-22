@@ -16,7 +16,27 @@ bool a;
 int x; 
 void iLoveThisCode (bool a, bool v){
         //instruction    
- 
+
+            __duration = 1000*( Omni.getSpeedMMPS() * (((2+2)+2)+2));
+            __begin = millis();
+            while((millis() - __begin) < __duration){Omni.setCarAdvance(Omni.getCarSpeedMMPS());}
+
+    while(true){
+
+            __duration = 1000*( Omni.getSpeedMMPS() * 4);
+            __begin = millis();
+            while((millis() - __begin) < __duration){Omni.setCarAdvance(Omni.getCarSpeedMMPS());}
+
+    }
+
+    if( false ){
+        /* instruction if*/ 
+    
+            __duration = 1000*( Omni.getSpeedMMPS() * 1);
+            __begin = millis();
+            while((millis() - __begin) < __duration){Omni.setCarAdvance(Omni.getCarSpeedMMPS());}
+
+    }  
 }
 irqISR(irq1, isr1);
 MotorWheel wheel1(3, 2, 4, 5, &irq1);
@@ -43,10 +63,6 @@ void setup() {
 void loop() {
     if(!__isDone){
     
-            __duration = 1000*( Omni.getSpeedMMPS() * (((2+2)+2)+2));
-            __begin = millis();
-            while((millis() - __begin) < __duration){Omni.setCarAdvance(Omni.getCarSpeedMMPS());}
-
     if( true ){
         /* instruction if*/ 
     

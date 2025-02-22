@@ -26,6 +26,9 @@ export class RobotVisitorImpl implements RobotMLVisitor {
     loopNode: CompositeGeneratorNode;
     currentType?: Type
     currentExprStr: string
+
+    currentBlock: CompositeGeneratorNode;
+
     parametre = "";
     para = false;
 
@@ -35,6 +38,8 @@ export class RobotVisitorImpl implements RobotMLVisitor {
         this.loopNode = expandToNode``
         this.currentType = undefined
         this.currentExprStr = ""
+
+        this.currentBlock=this.loopNode;
     } 
 
     private requireType(requiredType: string, message: string){
@@ -153,6 +158,8 @@ export class RobotVisitorImpl implements RobotMLVisitor {
     }
 
     visitFunc(node: Func) {
+        this.currentBlock=expandToNode``
+
         this.parametre="";
         this.para=true;
         node.parameter.forEach((para, i) => {if(i>0){this.parametre+=", "}; this.parametre+=(para.type.$type=="Bool" ? "bool ":"int ")+para.name/*para.accept(this)*/},)
@@ -161,12 +168,15 @@ ${(node.typeReturn == undefined ? "void " : node.typeReturn.$type+" ") }${node.n
         //instruction    
 `)
         node.instruction.accept(this); //block
+        this.declarationNode.append(this.currentBlock)
         this.declarationNode.append(` 
 }`)
 
 
         this.para=false;
         this.parametre="";
+
+        this.currentBlock=this.loopNode;
     }
 
     visitSensor(node: Sensor) {
@@ -288,7 +298,7 @@ ${(node.typeReturn == undefined ? "void " : node.typeReturn.$type+" ") }${node.n
         if(variableRef){
             node.expression.accept(this)
             this.requireExactType(variableRef.type, "Assignment to "+variableRef.name)
-            this.loopNode.append(`
+            this.currentBlock.append(`
             ${variableRef.name} = ${this.currentExprStr};`).appendNewLine()
         }
         else {
@@ -317,7 +327,7 @@ ${(node.typeReturn == undefined ? "void " : node.typeReturn.$type+" ") }${node.n
                     paramsStr += ", "
                 } 
             }
-            this.loopNode.append(`
+            this.currentBlock.append(`
             ${func.name}(${paramsStr});`).appendNewLine()
             this.currentType = undefined
         } else { throw new Error("undefined function") }
@@ -325,20 +335,20 @@ ${(node.typeReturn == undefined ? "void " : node.typeReturn.$type+" ") }${node.n
     visitCondition(node: Condition) {
         node.booleanexpr.accept(this);
 
-        this.loopNode.append(`
+        this.currentBlock.append(`
     if( ${this.currentExprStr} ){
         /* instruction if*/ 
     `)
         node.ifInstr.accept(this);
         
         if(node.elseInstr!=undefined) {
-            this.loopNode.append(`
+            this.currentBlock.append(`
     }else { 
     /*Instruction Else*/` )
             node.elseInstr.accept(this);
         }
         
-        this.loopNode.append(`
+        this.currentBlock.append(`
     } `)
     }
 
@@ -347,12 +357,12 @@ ${(node.typeReturn == undefined ? "void " : node.typeReturn.$type+" ") }${node.n
     visitLoop(node: Loop) {
         node.booleanexpr.accept(this)
         this.requireBool("Loop condition")
-        this.loopNode.append(`
+        this.currentBlock.append(`
     while(${this.currentExprStr}){`).appendNewLine()
 
         node.instruction.accept(this);
 
-        this.loopNode.append(`
+        this.currentBlock.append(`
     }`).appendNewLine()
     
     }
@@ -364,7 +374,7 @@ ${(node.typeReturn == undefined ? "void " : node.typeReturn.$type+" ") }${node.n
     private surroundWithDistanceLoop(distanceExpr: Expression, action: string){
         distanceExpr.accept(this)
         this.requireRealAnyDistUnit("linear movement")
-        this.loopNode.append(`
+        this.currentBlock.append(`
             __duration = 1000*( Omni.getSpeedMMPS() * ${this.currentExprStr});
             __begin = millis();
             while((millis() - __begin) < __duration){${action};}`).appendNewLine()
@@ -394,7 +404,7 @@ ${(node.typeReturn == undefined ? "void " : node.typeReturn.$type+" ") }${node.n
         if(unit == 'rad'){
             throw new Error("Rotation with radians not implemented yet")
         }else {
-            this.loopNode.append(`
+            this.currentBlock.append(`
             int __rota = ${this.currentExprStr};
             __duration = 1000*( Omni.getSpeedMMPS() * __rota);
             __begin = millis();
@@ -411,7 +421,7 @@ ${(node.typeReturn == undefined ? "void " : node.typeReturn.$type+" ") }${node.n
     visitSpeed(node: Speed) {
         node.parameter.accept(this) // expression
         this.requireRealAnyUnit("speed")
-        this.loopNode.append(`
+        this.currentBlock.append(`
             Omni.setCarSpeedMMPS(${this.currentExprStr});`).appendNewLine()
         this.currentType = undefined
     }

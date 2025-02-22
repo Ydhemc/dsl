@@ -6,6 +6,13 @@ var real: km x;
 
 iLoveThisCode(bool a, bool v){
     Forward 2 +2 +2 + 2;
+
+    loop(true){
+        Forward 4;
+    }
+    if(false){
+        Forward 1;
+    }
 }
 
 if(true){

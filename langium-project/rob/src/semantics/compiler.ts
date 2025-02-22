@@ -416,7 +416,10 @@ ${(node.typeReturn == undefined ? "void " : node.typeReturn.$type+" ") }${node.n
         this.currentType = undefined
     }
     visitReturn(node: Return) {
-        throw new Error("Method not implemented. return");
+        node.expression.accept(this)
+        this.currentBlock.append(`
+            return ${this.currentExprStr}
+        `)
     }
     visitSpeed(node: Speed) {
         node.parameter.accept(this) // expression

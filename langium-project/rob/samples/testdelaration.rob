@@ -9,6 +9,9 @@ iLoveThisCode(bool a, bool v){
 
     loop(true){
         Forward 4;
+        if(true){
+            Forward 6;
+        }
     }
     if(false){
         Forward 1;
@@ -23,4 +26,7 @@ if(true){
 
 loop(false){
     Forward 10;
+    loop(true){
+        Forward 5;
+    }
 }

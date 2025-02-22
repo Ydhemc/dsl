@@ -27,6 +27,14 @@ void iLoveThisCode (bool a, bool v){
             __begin = millis();
             while((millis() - __begin) < __duration){Omni.setCarAdvance(Omni.getCarSpeedMMPS());}
 
+    if( true ){
+        /* instruction if*/ 
+    
+            __duration = 1000*( Omni.getSpeedMMPS() * 6);
+            __begin = millis();
+            while((millis() - __begin) < __duration){Omni.setCarAdvance(Omni.getCarSpeedMMPS());}
+
+    } 
     }
 
     if( false ){
@@ -82,6 +90,14 @@ void loop() {
             __duration = 1000*( Omni.getSpeedMMPS() * 10);
             __begin = millis();
             while((millis() - __begin) < __duration){Omni.setCarAdvance(Omni.getCarSpeedMMPS());}
+
+    while(true){
+
+            __duration = 1000*( Omni.getSpeedMMPS() * 5);
+            __begin = millis();
+            while((millis() - __begin) < __duration){Omni.setCarAdvance(Omni.getCarSpeedMMPS());}
+
+    }
 
     }
     __isDone = true;

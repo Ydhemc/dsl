@@ -1,10 +1,15 @@
 var bool x;
 var real: mm y;
 
+real: mm hello(real: mm a, real: mm b, bool c){
+    if(c) return a + b;
+    return 2;
+}
+
 Forward 2 +2 +2 + 2;
 Backward 200;
 Rotate y + 9/2;
 Speed y;
 Left -2 * 2 + 2 * 2 * (2 * 2);
-Right y;
+Right hello(2, 2, true) + 2;
 

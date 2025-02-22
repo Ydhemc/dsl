@@ -46,6 +46,15 @@ export class RobotVisitorImpl implements RobotMLVisitor {
     private requireBool(message: string){
         this.requireType('Bool', message)
     }
+    private requireExactType(requiredType: Type | undefined, message: string){
+        if(requiredType == undefined){
+            throw new Error("The type should be [void] for : "+message)
+        }
+        else if(requiredType.$type == 'Bool') this.requireBool(message);
+        else {
+            this.requireRealOfUnit((requiredType as Real).unit, message)
+        }
+    }
     
 
     private requireRealOfUnit(unit: Unit, message: string){
@@ -55,7 +64,6 @@ export class RobotVisitorImpl implements RobotMLVisitor {
     }
 
     private requireRealAnyDistUnit(message: string): Unit{
-        console.log("type is "+this.currentType)
         if(this.currentType?.$type != 'Real' || (this.currentType as Real).unit == 'rad'){
             throw new Error("The type should be [Real (not in rad)] for : "+message)
         }
@@ -239,7 +247,24 @@ ${(node.typeReturn == undefined ? "void " : node.typeReturn.$type+" ") }${node.n
         this.currentExprStr = 'true'
     }
     visitCallExpr(node: CallExpr) {
-        throw new Error("Method not implemented.");
+        let func = node.fonction.ref
+        if(func){
+            if(func.parameter.length != node.parameters.length) {
+                throw new Error("Not right number of parameters for function call: "+func.name)
+            }
+            let params = node.parameters
+            let paramsStr = ""
+            for (let i = 0; i < params.length; i++) {
+                params[i].accept(this)
+                this.requireExactType(func.parameter[i].type, "Parameter "+func.parameter[i].name+" in "+func.name+" call")
+                paramsStr += this.currentExprStr
+                if(i != (params.length-1)) {
+                    paramsStr += ", "
+                } 
+            }
+            this.currentExprStr = func.name + "(" + paramsStr + ")"
+            this.currentType = func.typeReturn
+        } else { throw new Error("undefined function") }
     }
     visitNumeralExpr(node: NumeralExpr) {
         this.currentType = new Real('Real', 'mm')

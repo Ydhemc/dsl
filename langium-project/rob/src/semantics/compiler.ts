@@ -99,7 +99,6 @@ export class RobotVisitorImpl implements RobotMLVisitor {
 
         unsigned long __duration;
         unsigned long __begin;
-        `.append(this.declarationNode).append(expandToNode`
 
         irqISR(irq1, isr1);
         MotorWheel wheel1(3, 2, 4, 5, &irq1);
@@ -117,6 +116,8 @@ export class RobotVisitorImpl implements RobotMLVisitor {
         Omni4WD Omni(&wheel1, &wheel2, &wheel3, &wheel4);
         bool __isDone = false;
 
+        `.append(this.declarationNode).append(expandToNode`
+
         void setup() {
             TCCR1B = TCCR1B & 0xf8 | 0x01; // Pin9,Pin10 PWM 31250Hz
             TCCR2B = TCCR2B & 0xf8 | 0x01; // Pin3,Pin11 PWM 31250Hz
@@ -131,7 +132,7 @@ export class RobotVisitorImpl implements RobotMLVisitor {
         .append(expandToNode`
             __isDone = true;
             } else {
-                Omni.setCarSlow2Stop(1000)
+                Omni.setCarSlow2Stop(1000);
             }
         }`)
         return fileNode
@@ -362,7 +363,7 @@ export class RobotVisitorImpl implements RobotMLVisitor {
         distanceExpr.accept(this)
         this.requireRealAnyDistUnit("linear movement")
         this.currentBlock.append(`
-        __duration = 1000*( Omni.getSpeedMMPS() * ${this.currentExprStr});
+        __duration = 1000*( Omni.getCarSpeedMMPS() * ${this.currentExprStr});
         __begin = millis();
         while((millis() - __begin) < __duration){${action};}`).appendNewLine()
     }
@@ -393,11 +394,11 @@ export class RobotVisitorImpl implements RobotMLVisitor {
         }else {
             this.currentBlock.append(`
         int __rota = ${this.currentExprStr};
-        __duration = 1000*( Omni.getSpeedMMPS() * __rota);
+        __duration = 1000*( Omni.getCarSpeedMMPS() * __rota);
         __begin = millis();
         while((millis() - __begin) < __duration){
-            if(__rota < 0) Omni.setCarRotateLeft(Omni.getSpeedMMPS());
-            else Omni.setCarRotateRight(Omni.getSpeedMMPS());
+            if(__rota < 0) Omni.setCarRotateLeft(Omni.getCarSpeedMMPS());
+            else Omni.setCarRotateRight(Omni.getCarSpeedMMPS());
         }`).appendNewLine()
         }
         this.currentType = undefined

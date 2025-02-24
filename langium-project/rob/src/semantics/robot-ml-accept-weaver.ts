@@ -35,6 +35,7 @@ export class RobotMLAcceptWeaver {
         Assignment: this.weaveAssignment,
         Block: this.weaveBlock,
         Call: this.weaveCall,
+        Clock: this.weaveClock,
         Condition: this.weaveCondition,
         Loop: this.weaveLoop,
         Backward: this.weaveBackward,
@@ -116,6 +117,10 @@ export class RobotMLAcceptWeaver {
     
     weaveCall(node : InterfaceAST.Call, accept : ValidationAcceptor) : void {
         (<any> node).accept = (visitor: RobotMLVisitor) => { return visitor.visitCall(node as unknown as ClassAST.Call); }
+    }
+    
+    weaveClock(node : InterfaceAST.Clock, accept : ValidationAcceptor) : void {
+        (<any> node).accept = (visitor: RobotMLVisitor) => { return visitor.visitClock(node as unknown as ClassAST.Clock); }
     }
     
     weaveCondition(node : InterfaceAST.Condition, accept : ValidationAcceptor) : void {

@@ -12,7 +12,7 @@ Declaration returns Declaration:
 ;
 
 Instruction returns Instruction:
-    ((Call | Assignment | Return | Forward | Rotate | Left | Backward | Right | Speed ) ';' )
+    ((Call | Assignment | Return | Forward | Rotate | Left | Backward | Right | Speed | Clock ) ';' )
     | (Block | Loop | Condition)
 ;
 
@@ -150,6 +150,10 @@ Right returns Right:
 
 Speed returns Speed:
     {Speed} 'Speed' parameter=Expression 
+;
+
+Clock returns Clock:
+    {Clock} 'Clock' parameter=Expression 
 ;
 
 Not returns Not:

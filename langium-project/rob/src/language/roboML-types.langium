@@ -127,6 +127,10 @@ interface Speed extends Instruction {
 	parameter?: Expression
 }
 
+interface Clock extends Instruction {
+	parameter?: Expression
+}
+
 interface Not extends Expression, BooleanExpr {
 	expression: BooleanExpr
 }

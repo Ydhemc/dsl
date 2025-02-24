@@ -26,6 +26,7 @@ export interface RobotMLVisitor {
     visitAssignment(node : Assignment) : any;
     visitBlock(node : Block) : any;
     visitCall(node : Call) : any;
+    visitClock(node : Clock) : any;
     visitCondition(node : Condition) : any;
     visitLoop(node : Loop) : any;
     visitMovement(node : Movement) : any;
@@ -247,7 +248,7 @@ export class VarExpr extends Expression implements ASTInterfaces.VarExpr {
 
 export class Instruction implements ASTInterfaces.Instruction {
     
-    constructor(public $type: 'Instruction' | 'Assignment' | 'Block' | 'Call' | 'Condition' | 'Loop' | 'Movement' | 'Backward' | 'Forward' | 'Left' | 'Right' | 'Rotate' | 'Return' | 'Speed') {
+    constructor(public $type: 'Instruction' | 'Assignment' | 'Block' | 'Call' | 'Clock' | 'Condition' | 'Loop' | 'Movement' | 'Backward' | 'Forward' | 'Left' | 'Right' | 'Rotate' | 'Return' | 'Speed') {
     }
     
      accept(visitor: RobotMLVisitor) : any {
@@ -284,6 +285,17 @@ export class Call extends Instruction implements ASTInterfaces.Call {
     
     override accept(visitor: RobotMLVisitor) : any {
         return visitor.visitCall(this);
+    }
+}
+
+export class Clock extends Instruction implements ASTInterfaces.Clock {
+    
+    constructor(public override $type: 'Clock', public parameter: Expression) {
+        super($type);
+    }
+    
+    override accept(visitor: RobotMLVisitor) : any {
+        return visitor.visitClock(this);
     }
 }
 

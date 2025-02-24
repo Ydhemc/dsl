@@ -38,6 +38,7 @@ export type RobotMLKeywordNames =
     | ">"
     | ">="
     | "Backward"
+    | "Clock"
     | "Forward"
     | "Left"
     | "Right"
@@ -141,7 +142,7 @@ export function isExpression(item: unknown): item is Expression {
 }
 
 export interface Instruction extends AstNode {
-    readonly $type: 'Assignment' | 'Backward' | 'Block' | 'Call' | 'Condition' | 'Forward' | 'Instruction' | 'Left' | 'Loop' | 'Movement' | 'Return' | 'Right' | 'Rotate' | 'Speed';
+    readonly $type: 'Assignment' | 'Backward' | 'Block' | 'Call' | 'Clock' | 'Condition' | 'Forward' | 'Instruction' | 'Left' | 'Loop' | 'Movement' | 'Return' | 'Right' | 'Rotate' | 'Speed';
 }
 
 export const Instruction = 'Instruction';
@@ -333,6 +334,17 @@ export const Call = 'Call';
 
 export function isCall(item: unknown): item is Call {
     return reflection.isInstance(item, Call);
+}
+
+export interface Clock extends Instruction {
+    readonly $type: 'Clock';
+    parameter?: Expression;
+}
+
+export const Clock = 'Clock';
+
+export function isClock(item: unknown): item is Clock {
+    return reflection.isInstance(item, Clock);
 }
 
 export interface Condition extends Instruction {
@@ -539,6 +551,7 @@ export type RobotMLAstType = {
     BooleanExpr: BooleanExpr
     Call: Call
     CallExpr: CallExpr
+    Clock: Clock
     Condition: Condition
     Declaration: Declaration
     Expression: Expression
@@ -571,7 +584,7 @@ export type RobotMLAstType = {
 export class RobotMLAstReflection extends AbstractAstReflection {
 
     getAllTypes(): string[] {
-        return [ArithmeticExpr, Assignment, Backward, BinaryArithmetic, BinaryBool, Block, Bool, BooleanExpr, Call, CallExpr, Condition, Declaration, Expression, FalseExpr, Forward, Func, Instruction, Left, Loop, Movement, Negative, Not, NumeralExpr, Real, Return, Right, RobotProgram, Rotate, Sensor, SensorDistance, SensorExpr, SensorTime, Speed, TrueExpr, Type, VarExpr, Variable];
+        return [ArithmeticExpr, Assignment, Backward, BinaryArithmetic, BinaryBool, Block, Bool, BooleanExpr, Call, CallExpr, Clock, Condition, Declaration, Expression, FalseExpr, Forward, Func, Instruction, Left, Loop, Movement, Negative, Not, NumeralExpr, Real, Return, Right, RobotProgram, Rotate, Sensor, SensorDistance, SensorExpr, SensorTime, Speed, TrueExpr, Type, VarExpr, Variable];
     }
 
     protected override computeIsSubtype(subtype: string, supertype: string): boolean {
@@ -587,6 +600,7 @@ export class RobotMLAstReflection extends AbstractAstReflection {
             case Assignment:
             case Block:
             case Call:
+            case Clock:
             case Condition:
             case Loop:
             case Movement:
@@ -766,6 +780,14 @@ export class RobotMLAstReflection extends AbstractAstReflection {
                     properties: [
                         { name: 'fonction' },
                         { name: 'parameters', defaultValue: [] }
+                    ]
+                };
+            }
+            case Clock: {
+                return {
+                    name: Clock,
+                    properties: [
+                        { name: 'parameter' }
                     ]
                 };
             }

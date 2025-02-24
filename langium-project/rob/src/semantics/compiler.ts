@@ -1,4 +1,4 @@
-import { ArithmeticExpr, Assignment, Backward, BinaryArithmetic, BinaryBool, Block, Bool, BooleanExpr, Call, CallExpr, Condition, Declaration, Expression, FalseExpr, Forward, Func, Instruction, Left, Loop, Movement, Negative, Not, NumeralExpr, Real, Return, Right, RobotMLVisitor, RobotProgram, Rotate, Sensor, SensorDistance, SensorExpr, SensorTime, Speed, TrueExpr, Type, VarExpr, Variable } from "../semantics/robot-ml-visitor.js";
+import { ArithmeticExpr, Assignment, Backward, BinaryArithmetic, BinaryBool, Block, Bool, BooleanExpr, Call, CallExpr, Clock, Condition, Declaration, Expression, FalseExpr, Forward, Func, Instruction, Left, Loop, Movement, Negative, Not, NumeralExpr, Real, Return, Right, RobotMLVisitor, RobotProgram, Rotate, Sensor, SensorDistance, SensorExpr, SensorTime, Speed, TrueExpr, Type, VarExpr, Variable } from "../semantics/robot-ml-visitor.js";
 import { CompositeGeneratorNode, expandToNode, toString } from 'langium/generate';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
@@ -41,6 +41,13 @@ export class RobotVisitorImpl implements RobotMLVisitor {
         this.currentReturnType = undefined
         this.currentBlock=this.loopNode;
     } 
+    visitClock(node: Clock) {
+        node.parameter.accept(this) // expression
+        this.requireRealAnyUnit("clock")
+        this.currentBlock.append(`
+        delay(${this.currentExprStr});`).appendNewLine()
+        this.currentType = undefined
+    }
 
     private requireType(requiredType: string, message: string){
         if(this.currentType?.$type != requiredType){

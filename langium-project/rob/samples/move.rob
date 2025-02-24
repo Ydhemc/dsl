@@ -3,3 +3,4 @@ Forward 200;
 Backward 200;
 Left 200;
 Right 200;
+Clock 1000;
